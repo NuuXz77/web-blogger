@@ -6,7 +6,7 @@
                 <p class="text-gray-600 mt-1">Tambah informasi artikel.</p>
             </div>
 
-            <a href="{{ route('admin.posts.index') }}"
+            <a href="{{ route('user.posts.index') }}"
                 class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors duration-200">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -18,7 +18,7 @@
     </x-slot:header>
 
     <div>
-        <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('user.posts.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -532,7 +532,7 @@
         document.getElementById('title').addEventListener('input', function() {
             const title = this.value;
             if (title) {
-                fetch(`{{ route('admin.posts.generate-slug') }}?title=${encodeURIComponent(title)}`)
+                fetch(`{{ route('user.posts.generate-slug') }}?title=${encodeURIComponent(title)}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('slug').value = data.slug;

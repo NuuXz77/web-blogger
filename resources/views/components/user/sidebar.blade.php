@@ -1,30 +1,16 @@
+<!-- filepath: d:\PKL\web-blogger\resources\views\components\user\sidebar.blade.php -->
 @php
 $currentRoute = request()->route()->getName();
 $menuItems = [
     [
         'name' => 'Dasbor',
-        'route' => 'admin.dashboard',
+        'route' => 'dashboard',
         'icon' => 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z'
     ],
     [
-        'name' => 'Artikel',
-        'route' => 'admin.posts.index',
+        'name' => 'Artikel Saya',
+        'route' => 'user.posts.index',
         'icon' => 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z'
-    ],
-    [
-        'name' => 'Kategori',
-        'route' => 'admin.categories.index',
-        'icon' => 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'
-    ],
-    [
-        'name' => 'Komentar',
-        'route' => 'admin.comments.index',
-        'icon' => 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
-    ],
-    [
-        'name' => 'Users',
-        'route' => 'admin.users.index',
-        'icon' => 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m10-6.13a4 4 0 11-8 0 4 4 0 018 0zM7 10a4 4 0 108 0'
     ]
 ];
 @endphp
@@ -42,10 +28,7 @@ $menuItems = [
                     @foreach($menuItems as $item)
                         @php
                             $isActive = $currentRoute === $item['route'] || 
-                                      (str_contains($item['route'], 'posts') && str_contains($currentRoute, 'posts')) ||
-                                      (str_contains($item['route'], 'categories') && str_contains($currentRoute, 'categories')) ||
-                                      (str_contains($item['route'], 'comments') && str_contains($currentRoute, 'comments')) ||
-                                      (str_contains($item['route'], 'users') && str_contains($currentRoute, 'users'));
+                                      (str_contains($item['route'], 'posts') && str_contains($currentRoute, 'posts'));
                         @endphp
                         <li>
                             <a 
@@ -89,12 +72,12 @@ $menuItems = [
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
                                 <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-800">Panel Admin</p>
-                                <p class="text-xs text-gray-600">Kelola blog Anda</p>
+                                <p class="text-sm font-medium text-gray-800">Panel Penulis</p>
+                                <p class="text-xs text-gray-600">Kelola artikel Anda</p>
                             </div>
                         </div>
                     </div>
@@ -103,13 +86,13 @@ $menuItems = [
                     <div class="pt-2">
                         <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi Cepat</h3>
                         <div class="mt-2 space-y-1">
-                            <a href="{{ route('admin.posts.create') }}" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-primary hover:bg-gray-50">
+                            <a href="{{ route('user.posts.create') }}" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-primary hover:bg-gray-50">
                                 <svg class="text-gray-400 mr-3 flex-shrink-0 h-5 w-5 group-hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
                                 Artikel Baru
                             </a>
-                            <a href="/" target="__blank" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-primary hover:bg-gray-50">
+                            <a href="/" target="_blank" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-primary hover:bg-gray-50">
                                 <svg class="text-gray-400 mr-3 flex-shrink-0 h-5 w-5 group-hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -136,7 +119,7 @@ $menuItems = [
                             {{ auth()->user()->name }}
                         </p>
                         <p class="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                            {{ ucfirst(auth()->user()->role) }}
+                            Penulis
                         </p>
                     </div>
                 </div>

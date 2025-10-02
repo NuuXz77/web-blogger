@@ -1,21 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Page Not Found | Web Blogger</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3B82F6',
-                    }
-                }
-            }
-        }
-    </script>
+    <title>404 - Halaman Tidak Ditemukan | Web Blogger</title>
+    @vite('resources/css/app.css')
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -40,10 +29,10 @@
                     404
                 </h1>
                 <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">
-                    Oops! Page Not Found
+                    Ups! Halaman Tidak Ditemukan
                 </h2>
                 <p class="text-lg text-gray-600 max-w-md mx-auto">
-                    Sorry, the page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.
+                    Maaf, halaman yang Anda cari tidak ada. Mungkin telah dipindahkan, dihapus, atau Anda salah memasukkan URL.
                 </p>
             </div>
 
@@ -53,7 +42,7 @@
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
-                    Back to Home
+                    Kembali ke Beranda
                 </a>
 
                 @auth
@@ -61,46 +50,46 @@
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
-                        Go to Dashboard
+                        Ke Dasbor
                     </a>
                 @else
                     <a href="{{ route('login') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-200 shadow-lg">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                         </svg>
-                        Login
+                        Masuk
                     </a>
                 @endauth
             </div>
 
             <!-- Additional Help -->
             <div class="mt-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900 mb-3">What you can do:</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-3">Yang dapat Anda lakukan:</h3>
                 <div class="space-y-2 text-sm text-gray-600">
                     <div class="flex items-center">
                         <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        Check the URL for typos
+                        Periksa URL untuk kesalahan pengetikan
                     </div>
                     <div class="flex items-center">
                         <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        Use the search function to find what you're looking for
+                        Gunakan fungsi pencarian untuk menemukan yang Anda cari
                     </div>
                     <div class="flex items-center">
                         <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
-                        Go back to the homepage and navigate from there
+                        Kembali ke halaman utama dan navigasi dari sana
                     </div>
                 </div>
             </div>
 
             <!-- Footer -->
             <div class="text-sm text-gray-500">
-                <p>&copy; {{ date('Y') }} Web Blogger. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} Web Blogger. Semua hak dilindungi.</p>
             </div>
         </div>
     </div>

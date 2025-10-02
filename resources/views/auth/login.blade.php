@@ -96,6 +96,23 @@
                 </button>
             </div>
 
+            <!-- Notes -->
+            <div class="mt-4 space-y-3">
+                <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <p class="text-sm font-medium text-gray-700">Catatan Admin</p>
+                    <div class="mt-2 text-sm text-gray-800">
+                        <p>Gunakan kredensial berikut untuk login sebagai admin:</p>
+                        <ul class="mt-1 list-disc list-inside">
+                            <li>Email: <span class="font-mono">admin@a.com</span></li>
+                            <li>Password: <span class="font-mono">adminadmin</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-700">
+                    Ingin menjadi penulis? <a href="{{ route('register') }}" class="text-primary hover:text-blue-700 font-medium">Daftar untuk menjadi writer</a>.
+                </p>
+            </div>
+
             <!-- Register Link -->
             <div class="text-center">
                 <p class="text-sm text-gray-600">

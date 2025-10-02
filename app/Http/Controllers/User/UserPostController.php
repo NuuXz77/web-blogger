@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use App\Models\Posts;
+use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
-class PostController extends Controller
+class UserPostController extends Controller
 {
     /**
      * Display welcome page with latest published posts.
@@ -24,7 +26,7 @@ class PostController extends Controller
         return view('welcome', compact('posts'));
     }
 
-        /**
+    /**
      * Display the specified post by slug for public view.
      */
     public function show($slug)
@@ -48,25 +50,38 @@ class PostController extends Controller
     }
 
     /**
-     * Display the specified post in admin panel.
+     * Display the specified post in user panel.
      */
-    public function adminShow(Posts $post)
+    public function userShow(Posts $post)
     {
+        // Check if user can view this post (author only)
+        if ($post->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $post->load(['user', 'category', 'comments.user']);
         
-        return view('admin.posts.show', compact('post'));
+        return view('user.posts.show', compact('post'));
     }
 
     /**
-     * Display a listing of the posts.
+     * Display a listing of the user's posts.
      */
     public function index()
     {
         $posts = Posts::with(['user', 'category'])
+            ->where('user_id', Auth::id())
             ->latest()
             ->paginate(10);
 
-        return view('admin.posts.index', compact('posts'));
+        // Add statistics for the user
+        $stats = [
+            'total_posts' => Posts::where('user_id', Auth::id())->count(),
+            'published_posts' => Posts::where('user_id', Auth::id())->where('status', 'published')->count(),
+            'draft_posts' => Posts::where('user_id', Auth::id())->where('status', 'draft')->count(),
+        ];
+
+        return view('user.posts.index', compact('posts', 'stats'));
     }
 
     /**
@@ -78,7 +93,7 @@ class PostController extends Controller
             ->orderBy('name')
             ->get();
             
-        return view('admin.posts.create', compact('categories'));
+        return view('user.posts.create', compact('categories'));
     }
 
     /**
@@ -112,15 +127,13 @@ class PostController extends Controller
             'excerpt' => $validated['excerpt'] ?? Str::limit(strip_tags($validated['content']), 150),
             'status' => $validated['status'],
             'featured_image' => $featuredImagePath,
-            // 'meta_title' => $validated['meta_title'] ?? $validated['title'],
-            // 'meta_description' => $validated['meta_description'] ?? $validated['excerpt'],
             'category_id' => $validated['category_id'],
-            'user_id' => Auth::id(),
+            'user_id' => Auth::id(), // Ensure post belongs to authenticated user
             'published_at' => $validated['status'] === 'published' ? now() : null,
         ]);
 
         return redirect()
-            ->route('admin.posts.show', $post)
+            ->route('user.posts.show', $post)
             ->with('success', 'Post berhasil dibuat!');
     }
 
@@ -129,8 +142,8 @@ class PostController extends Controller
      */
     public function edit(Posts $post)
     {
-        // Check if user can edit this post (author or admin)
-        if (Auth::user()->role !== 'admin' && $post->user_id !== Auth::id()) {
+        // Check if user can edit this post (author only)
+        if ($post->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -138,7 +151,7 @@ class PostController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.posts.edit', compact('post', 'categories'));
+        return view('user.posts.edit', compact('post', 'categories'));
     }
 
     /**
@@ -146,8 +159,8 @@ class PostController extends Controller
      */
     public function update(Request $request, Posts $post)
     {
-        // Check if user can edit this post (author or admin)
-        if (Auth::user()->role !== 'admin' && $post->user_id !== Auth::id()) {
+        // Check if user can edit this post (author only)
+        if ($post->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -194,14 +207,12 @@ class PostController extends Controller
             'excerpt' => $validated['excerpt'] ?? Str::limit(strip_tags($validated['content']), 150),
             'status' => $validated['status'],
             'featured_image' => $featuredImagePath,
-            // 'meta_title' => $validated['meta_title'] ?? $validated['title'],
-            // 'meta_description' => $validated['meta_description'] ?? $validated['excerpt'],
             'category_id' => $validated['category_id'],
             'published_at' => $publishedAt,
         ]);
 
         return redirect()
-            ->route('admin.posts.show', $post)
+            ->route('user.posts.show', $post)
             ->with('success', 'Post berhasil diperbarui!');
     }
 
@@ -210,8 +221,8 @@ class PostController extends Controller
      */
     public function destroy(Posts $post)
     {
-        // Check if user can delete this post (author or admin)
-        if (Auth::user()->role !== 'admin' && $post->user_id !== Auth::id()) {
+        // Check if user can delete this post (author only)
+        if ($post->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -224,7 +235,7 @@ class PostController extends Controller
         $post->delete();
 
         return redirect()
-            ->route('admin.posts.index')
+            ->route('user.posts.index')
             ->with('success', 'Post berhasil dihapus!');
     }
 
@@ -233,8 +244,8 @@ class PostController extends Controller
      */
     public function toggleStatus(Posts $post)
     {
-        // Check if user can edit this post (author or admin)
-        if (Auth::user()->role !== 'admin' && $post->user_id !== Auth::id()) {
+        // Check if user can edit this post (author only)
+        if ($post->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -256,8 +267,8 @@ class PostController extends Controller
      */
     public function duplicate(Posts $post)
     {
-        // Check if user can duplicate this post (author or admin)
-        if (Auth::user()->role !== 'admin' && $post->user_id !== Auth::id()) {
+        // Check if user can duplicate this post (author only)
+        if ($post->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -266,13 +277,13 @@ class PostController extends Controller
         $newPost->slug = $post->slug . '-copy-' . time();
         $newPost->status = 'draft';
         $newPost->published_at = null;
-        $newPost->user_id = Auth::id();
+        $newPost->user_id = Auth::id(); // Ensure duplicated post belongs to authenticated user
         $newPost->created_at = now();
         $newPost->updated_at = now();
         $newPost->save();
 
         return redirect()
-            ->route('admin.posts.edit', $newPost)
+            ->route('user.posts.edit', $newPost)
             ->with('success', 'Post berhasil diduplikasi!');
     }
 
@@ -284,18 +295,47 @@ class PostController extends Controller
         $query = $request->get('q');
         
         $posts = Posts::with(['user', 'category'])
-            ->join('users', 'posts.user_id', '=', 'users.id')
+            ->where('user_id', Auth::id()) // Only search within user's own posts
             ->where(function($q) use ($query) {
-                $q->where('posts.title', 'like', "%{$query}%")
-                  ->orWhere('posts.content', 'like', "%{$query}%")
-                  ->orWhere('posts.excerpt', 'like', "%{$query}%")
-                  ->orWhere('users.name', 'like', "%{$query}%");
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('content', 'like', "%{$query}%")
+                  ->orWhere('excerpt', 'like', "%{$query}%");
             })
-            ->select('posts.*') // Ensure we only get posts fields to avoid column duplication
-            ->latest('posts.created_at')
+            ->latest()
             ->paginate(10);
 
-        return view('admin.posts.index', compact('posts', 'query'));
+        // Add statistics for the search results
+        $stats = [
+            'total_posts' => Posts::where('user_id', Auth::id())->count(),
+            'published_posts' => Posts::where('user_id', Auth::id())->where('status', 'published')->count(),
+            'draft_posts' => Posts::where('user_id', Auth::id())->where('status', 'draft')->count(),
+        ];
+
+        return view('user.posts.index', compact('posts', 'query', 'stats'));
+    }
+
+    /**
+     * Get posts by status for the authenticated user
+     */
+    public function getPostsByStatus($status = null)
+    {
+        $query = Posts::with(['user', 'category'])
+            ->where('user_id', Auth::id());
+
+        if ($status && in_array($status, ['published', 'draft'])) {
+            $query->where('status', $status);
+        }
+
+        $posts = $query->latest()->paginate(10);
+
+        // Add statistics
+        $stats = [
+            'total_posts' => Posts::where('user_id', Auth::id())->count(),
+            'published_posts' => Posts::where('user_id', Auth::id())->where('status', 'published')->count(),
+            'draft_posts' => Posts::where('user_id', Auth::id())->where('status', 'draft')->count(),
+        ];
+
+        return view('user.posts.index', compact('posts', 'stats'));
     }
 
     /**

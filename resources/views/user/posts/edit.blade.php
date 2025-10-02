@@ -11,7 +11,7 @@
 
             </h2>
             <div class="flex space-x-2">
-                <a href="{{ route('admin.posts.show', $post) }}"
+                <a href="{{ route('user.posts.show', $post) }}"
                     class="inline-flex items-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -22,7 +22,7 @@
                     </svg>
                     Lihat Postingan
                 </a>
-                <a href="{{ route('admin.posts.index') }}"
+                <a href="{{ route('user.posts.index') }}"
                     class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -35,7 +35,7 @@
     </x-slot>
 
     <div>
-        <form action="{{ route('admin.posts.update', $post) }}" method="POST" enctype="multipart/form-data"
+        <form action="{{ route('user.posts.update', $post) }}" method="POST" enctype="multipart/form-data"
             class="space-y-6">
             @csrf
             @method('PUT')
@@ -457,7 +457,7 @@ Anda dapat mengubah paragraf, menambahkan bagian baru, memperbarui daftar, kutip
 
             // Only auto-generate if slug is empty or still matches the original pattern
             if (title && (!currentSlug || currentSlug === originalSlug)) {
-                fetch(`{{ route('admin.posts.generate-slug') }}?title=${encodeURIComponent(title)}`)
+                fetch(`{{ route('user.posts.generate-slug') }}?title=${encodeURIComponent(title)}`)
                     .then(response => response.json())
                     .then(data => {
                         slugField.value = data.slug;

@@ -5,7 +5,7 @@
                 <h1 class="text-2xl font-bold text-gray-900">Manajemen Postingan</h1>
                 <p class="text-gray-600 mt-1">Kelola postingan dan artikel blog</p>
             </div>
-            <a href="{{ route('admin.posts.create') }}"
+            <a href="{{ route('user.posts.create') }}"
                class="inline-flex items-center px-4 py-2 bg-[#0046FF] hover:bg-[#0036D8] text-white rounded-md transition-colors duration-200 shadow-sm">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -23,7 +23,7 @@
 
     <div class="py-6">
         <div class="mb-6">
-            <form action="{{ route('admin.posts.search') }}" method="GET" class="flex gap-4">
+            <form action="{{ route('user.posts.search') }}" method="GET" class="flex gap-4">
                 <div class="flex-1 relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +49,7 @@
                 </button>
                 @if(request('q'))
                     <a
-                        href="{{ route('admin.posts.index') }}"
+                        href="{{ route('user.posts.index') }}"
                         class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0046FF] transition duration-200"
                     >
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +91,7 @@
                                         <div class="flex items-center">
                                             <div>
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    <a href="{{ route('admin.posts.show', $post) }}" class="hover:text-primary">
+                                                    <a href="{{ route('user.posts.show', $post) }}" class="hover:text-primary">
                                                         {{ $post->title }}
                                                     </a>
                                                 </div>
@@ -142,7 +142,7 @@
                                             >
                                                 <div class="py-1" role="menu">
                                                     <a
-                                                        href="{{ route('admin.posts.show', $post) }}"
+                                                        href="{{ route('user.posts.show', $post) }}"
                                                         class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                                         role="menuitem"
                                                     >
@@ -154,7 +154,7 @@
                                                     </a>
 
                                                     <a
-                                                        href="{{ route('admin.posts.edit', $post) }}"
+                                                        href="{{ route('user.posts.edit', $post) }}"
                                                         class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                                         role="menuitem"
                                                     >
@@ -164,7 +164,7 @@
                                                         Edit Postingan
                                                     </a>
 
-                                                    <form action="{{ route('admin.posts.toggle-status', $post) }}" method="POST" class="block">
+                                                    <form action="{{ route('user.posts.toggle-status', $post) }}" method="POST" class="block">
                                                         @csrf
                                                         <button
                                                             type="submit"
@@ -186,7 +186,7 @@
                                                         </button>
                                                     </form>
 
-                                                    <form action="{{ route('admin.posts.duplicate', $post) }}" method="POST" class="block">
+                                                    <form action="{{ route('user.posts.duplicate', $post) }}" method="POST" class="block">
                                                         @csrf
                                                         <button
                                                             type="submit"
@@ -202,7 +202,7 @@
 
                                                     <div class="border-t border-gray-100"></div>
 
-                                                    <form action="{{ route('admin.posts.destroy', $post) }}" method="POST" class="block"
+                                                    <form action="{{ route('user.posts.destroy', $post) }}" method="POST" class="block"
                                                           onsubmit="return confirm('Apakah Anda yakin ingin menghapus postingan ini? Tindakan ini tidak dapat dibatalkan.')">
                                                         @csrf
                                                         @method('DELETE')
@@ -250,7 +250,7 @@
                         @endif
                     </p>
                     @if(!isset($query))
-                        <a href="{{ route('admin.posts.create') }}"
+                        <a href="{{ route('user.posts.create') }}"
                            class="inline-flex items-center px-4 py-2 bg-[#0046FF] hover:bg-[#0036D8] text-white rounded-md transition-colors duration-200">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -258,14 +258,14 @@
                             Buat Postingan Pertama
                         </a>
                     @else
-                        <a href="{{ route('admin.posts.index') }}"
+                        <a href="{{ route('user.posts.index') }}"
                            class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors duration-200 mr-3">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19l-7-7m0 0l7-7m-7 7h18"/>
                             </svg>
                             Lihat Semua Postingan
                         </a>
-                        <a href="{{ route('admin.posts.create') }}"
+                        <a href="{{ route('user.posts.create') }}"
                            class="inline-flex items-center px-4 py-2 bg-[#0046FF] hover:bg-[#0036D8] text-white rounded-md transition-colors duration-200">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>

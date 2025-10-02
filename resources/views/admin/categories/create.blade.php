@@ -1,21 +1,23 @@
 <x-layouts.app title="Kategori Baru">
 
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">Buat Kategori Baru</h1>
-            <p class="text-gray-600 mt-1">Tambahkan kategori baru untuk mengorganisir artikel blog Anda</p>
+    <x-slot:header>
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Buat Kategori Baru</h1>
+                <p class="text-gray-600 mt-1">Tambahkan kategori baru untuk mengorganisir artikel blog Anda</p>
+            </div>
+            <a href="{{ route('admin.categories.index') }}" 
+               class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Kembali ke Kategori
+            </a>
         </div>
-        <a href="{{ route('admin.categories.index') }}" 
-           class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors duration-200">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            Kembali ke Kategori
-        </a>
-    </div>
+    </x-slot:header>
 
     <!-- Form Card -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6 border-b border-gray-200">
             <h2 class="text-lg font-semibold text-gray-900">Informasi Kategori</h2>
             <p class="text-sm text-gray-600 mt-1">Isi detail untuk kategori baru</p>

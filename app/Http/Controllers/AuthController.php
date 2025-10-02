@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\User;
 use App\Models\Posts;
 use App\Models\Comments;
@@ -61,7 +62,7 @@ class AuthController extends Controller
                     ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
             }
             
-            return redirect()->intended('/dashboard')
+            return redirect()->intended('/user/dashboard')
                 ->with('success', 'Login berhasil! Selamat datang, ' . $user->name . '.');
         }
 
@@ -116,7 +117,7 @@ class AuthController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => 'admin', // Default role
+                'role' => 'user', // Default role
             ]);
 
             // Auto login after registration
@@ -151,18 +152,28 @@ class AuthController extends Controller
      */
     public function dashboard()
     {
-        /** @var User $user */
         $user = Auth::user();
         
-        if ($user->isAdmin()) {
-            return redirect('/admin/dashboard');
-        }
-
-        $title = 'Dashboard - Web Blogger';
-        $userPosts = $user->posts()->latest()->take(5)->get();
-        $userComments = $user->comments()->latest()->take(5)->get();
-
-        return view('dashboard', compact('user', 'userPosts', 'userComments', 'title'));
+        // Get user statistics
+        $stats = [
+            'total_posts' => \App\Models\Posts::where('user_id', $user->id)->count(),
+            'published_posts' => \App\Models\Posts::where('user_id', $user->id)->where('status', 'published')->count(),
+            'draft_posts' => \App\Models\Posts::where('user_id', $user->id)->where('status', 'draft')->count(),
+        ];
+        
+        // Get recent posts (last 5)
+        $recentPosts = \App\Models\Posts::with(['category'])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get();
+        
+        return view('dashboard', [
+            'title' => 'Dashboard',
+            'user' => $user,
+            'stats' => $stats,
+            'recentPosts' => $recentPosts
+        ]);
     }
 
     /**
@@ -178,6 +189,7 @@ class AuthController extends Controller
         // Get statistics
         $totalViews = Posts::sum('views_count');
         $totalPosts = Posts::count();
+        $totalCategories = Category::count();
         $totalComments = Comments::count();
         $pendingComments = Comments::where('status', 'pending')->count();
         
@@ -190,6 +202,7 @@ class AuthController extends Controller
             'totalViews', 
             'totalPosts', 
             'totalComments', 
+            'totalCategories', 
             'pendingComments',
             'recentPosts',
             'recentUsers'
@@ -254,4 +267,5 @@ class AuthController extends Controller
 
         return back()->with('success', 'Profile berhasil diperbarui.');
     }
+    
 }

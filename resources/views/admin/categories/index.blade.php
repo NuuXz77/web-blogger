@@ -18,7 +18,7 @@
 
     <!-- Success Message -->
     @if(session('success'))
-        <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-md">
+        <div class="mt-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-md">
             {{ session('success') }}
         </div>
     @endif
