@@ -35,7 +35,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = ['admin', 'user'];
+        $roles = ['user', 'auditor'];
         return view('admin.users.create', compact('roles'));
     }
 
@@ -45,7 +45,7 @@ class UserController extends Controller
             'name' => ['required','string','max:255'],
             'email' => ['required','email','max:255','unique:users,email'],
             'password' => ['required','string','min:8','confirmed'],
-            'role' => ['required', Rule::in(['admin','user'])],
+            'role' => ['required', Rule::in(['user','auditor'])],
         ]);
 
         User::create([
@@ -65,7 +65,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $roles = ['admin', 'user'];
+        $roles = ['user', 'auditor'];
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
@@ -75,7 +75,7 @@ class UserController extends Controller
             'name' => ['required','string','max:255'],
             'email' => ['required','email','max:255', Rule::unique('users','email')->ignore($user->id)],
             'password' => ['nullable','string','min:8','confirmed'],
-            'role' => ['required', Rule::in(['admin','user'])],
+            'role' => ['required', Rule::in(['user','auditor'])],
         ]);
 
         $data = [

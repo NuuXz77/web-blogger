@@ -2,13 +2,18 @@
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title }}</title>
-
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{asset('images/favicon-32x32.png')}}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{asset('images/favicon-16x16.png')}}">
+    <link rel="icon" type="image/png" href="{{asset('images/favicon-16x16.png')}}">
+    <link rel="manifest" href="/site.webmanifest">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -16,6 +21,13 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- Loading Progress Bar Styles -->
     <style>
         .loading-overlay {
@@ -54,9 +66,17 @@
         }
 
         @keyframes progress {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
+            0% {
+                width: 0%;
+            }
+
+            50% {
+                width: 70%;
+            }
+
+            100% {
+                width: 100%;
+            }
         }
 
         .loading-spinner {
@@ -69,8 +89,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-text {
@@ -81,11 +106,19 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
     </style>
 </head>
+
 <body class="font-sans antialiased bg-gray-50">
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
@@ -96,13 +129,40 @@
         <div class="loading-text">Memuat halaman...</div>
     </div>
 
-    @if(auth()->check() && auth()->user()->role === 'admin')
+    @if (auth()->check() && auth()->user()->role === 'admin')
         <!-- Admin Layout -->
         <div class="min-h-screen">
             <!-- Admin Sidebar -->
             <x-admin.sidebar />
             <!-- Admin Navbar -->
             <x-admin.navbar />
+
+            <!-- Main Content Area -->
+            <div class="lg:ml-64">
+                <main class="p-4 pt-20">
+                    <!-- Page Header -->
+                    @if (isset($header))
+                        <div>
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                {{ $header }}
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Page Content -->
+                    <div class="min-h-screen">
+                        {{ $slot }}
+                    </div>
+                </main>
+            </div>
+        </div>
+    @elseif(auth()->check() && auth()->user()->role === 'auditor')
+        <!-- Auditor Layout -->
+        <div class="min-h-screen">
+            <!-- Auditor Sidebar -->
+            <x-auditor.sidebar />
+            <!-- Auditor Navbar -->
+            <x-auditor.navbar />
 
             <!-- Main Content Area -->
             <div class="lg:ml-64">
@@ -177,21 +237,23 @@
             // Handle navigation links clicks
             document.addEventListener('click', function(e) {
                 const target = e.target.closest('a');
-                
+
                 if (target && target.href) {
                     const currentPath = window.location.pathname;
                     const targetPath = new URL(target.href).pathname;
-                    
+
                     // Check if it's a dashboard route navigation
-                    const isDashboardRoute = targetPath.includes('/dashboard') || targetPath.includes('/posts') || targetPath.includes('/admin');
+                    const isDashboardRoute = targetPath.includes('/dashboard') || targetPath.includes(
+                        '/posts') || targetPath.includes('/admin');
                     const isDifferentRoute = currentPath !== targetPath;
                     const isNotExternal = target.href.startsWith(window.location.origin);
                     const isNotDownload = !target.hasAttribute('download');
                     const isNotBlank = target.getAttribute('target') !== '_blank';
-                    
-                    if (isDashboardRoute && isDifferentRoute && isNotExternal && isNotDownload && isNotBlank) {
+
+                    if (isDashboardRoute && isDifferentRoute && isNotExternal && isNotDownload &&
+                        isNotBlank) {
                         showLoading();
-                        
+
                         setTimeout(() => {
                             hideLoading();
                         }, 100);
@@ -204,7 +266,7 @@
                 const form = e.target;
                 const action = form.getAttribute('action');
                 const method = form.getAttribute('method') || 'GET';
-                
+
                 if (action && method.toLowerCase() === 'get') {
                     showLoading();
                     setTimeout(() => {
@@ -234,4 +296,5 @@
         });
     </script>
 </body>
+
 </html>

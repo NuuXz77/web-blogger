@@ -5,7 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Web Blogger - Temukan Cerita-Cerita Luar Biasa</title>
-
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{asset('images/favicon-32x32.png')}}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{asset('images/favicon-16x16.png')}}">
+    <link rel="icon" type="image/png" href="{{asset('images/favicon-16x16.png')}}">
+    <link rel="manifest" href="/site.webmanifest">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
@@ -42,12 +46,17 @@
 
                 <div class="flex items-center space-x-4">
                     @auth
-                        <a href="{{ route('dashboard') }}"
+                        <a href="{{ route('admin.dashboard') }}"
                             class="text-gray-700 hover:text-primary transition duration-200">Dasbor</a>
                         @if (auth()->user()->role === 'admin')
                             <a href="{{ route('admin.dashboard') }}"
                                 class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 transition ease-in-out duration-150">
                                 Panel Admin
+                            </a>
+                        @elseif (auth()->user()->role === 'auditor')
+                            <a href="{{ route('auditor.dashboard') }}"
+                                class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 transition ease-in-out duration-150">
+                                Panel Auditor
                             </a>
                         @endif
                     @else

@@ -60,6 +60,9 @@ class AuthController extends Controller
             if ($user->isAdmin()) {
                 return redirect()->intended('/admin/dashboard')
                     ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
+            } elseif ($user->isAuditor()) {
+                return redirect()->intended('/auditor/dashboard')
+                    ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
             }
             
             return redirect()->intended('/user/dashboard')
@@ -197,6 +200,35 @@ class AuthController extends Controller
         $recentUsers = User::latest()->take(5)->get();
 
         return view('admin.dashboard', compact(
+            'user', 
+            'title',
+            'totalViews', 
+            'totalPosts', 
+            'totalComments', 
+            'totalCategories', 
+            'pendingComments',
+            'recentPosts',
+            'recentUsers'
+        ));
+    }
+    public function auditDashboard()
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        
+        $title = 'Audit Dashboard - Web Blogger';
+        
+        // Get statistics
+        $totalViews = Posts::sum('views_count');
+        $totalPosts = Posts::count();
+        $totalCategories = Category::count();
+        $totalComments = Comments::count();
+        $pendingComments = Comments::where('status', 'pending')->count();
+        
+        $recentPosts = Posts::latest()->take(5)->get();
+        $recentUsers = User::latest()->take(5)->get();
+
+        return view('auditor.dashboard', compact(
             'user', 
             'title',
             'totalViews', 

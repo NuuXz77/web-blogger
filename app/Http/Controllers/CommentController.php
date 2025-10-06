@@ -88,6 +88,11 @@ class CommentController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Apply post filter
+        if ($request->filled('post_id')) {
+            $query->where('post_id', $request->post_id);
+        }
+
         $comments = $query->latest()->paginate(10);
 
         // Calculate stats
@@ -98,7 +103,10 @@ class CommentController extends Controller
             'spam' => Comment::where('status', 'spam')->count(),
         ];
 
-        return view('admin.comments.index', compact('comments', 'stats'));
+        // Get posts that have comments for the filter dropdown
+        $postsWithComments = Posts::whereHas('comments')->select('id', 'title')->orderBy('title')->get();
+
+        return view('admin.comments.index', compact('comments', 'stats', 'postsWithComments'));
     }
 
     /**

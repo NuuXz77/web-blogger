@@ -87,6 +87,193 @@
             </div>
         </div>
 
+        <!-- Visits Chart -->
+        <div class="bg-white shadow-sm rounded-lg border border-gray-200 mb-6 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Grafik Kunjungan</h3>
+                <div class="flex items-center space-x-3">
+                    <select id="chart-range" class="appearance-none bg-white border border-gray-300 text-gray-700 py-2 pl-3 pr-8 rounded-lg shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 text-sm">
+                        <option value="day">Per Hari (7 hari)</option>
+                        <option value="week" selected>Per Minggu (4 minggu)</option>
+                        <option value="month">Per Bulan (12 bulan)</option>
+                        <option value="custom">Kustom</option>
+                    </select>
+
+                    <select id="chart-auditor" class="appearance-none bg-white border border-gray-300 text-gray-700 py-2 pl-3 pr-8 rounded-lg shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 text-sm">
+                        <option value="">Semua Auditor</option>
+                        @foreach(App\Models\User::where('role','auditor')->get() as $aud)
+                            <option value="{{ $aud->id }}">{{ $aud->name }}</option>
+                        @endforeach
+                    </select>
+
+                    <div id="custom-dates" class="hidden items-center space-x-2">
+                        <input type="date" id="start-date" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <input type="date" id="end-date" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    </div>
+
+                    <button id="update-chart" class="bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition duration-150">Terapkan</button>
+                </div>
+            </div>
+
+            <!-- Chart Container with Loading -->
+            <div class="relative" style="height: 400px;">
+                <div id="chart-loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-lg z-10">
+                    <div class="flex flex-col items-center">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <p class="text-sm text-gray-600 mt-2">Memuat grafik...</p>
+                    </div>
+                </div>
+                <canvas id="visitsChart" style="height: 100%; width: 100%;"></canvas>
+            </div>
+        </div>
+
+        <!-- Chart.js Script -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const ctx = document.getElementById('visitsChart').getContext('2d');
+                const primaryColor = '#0046FF';
+                const loadingEl = document.getElementById('chart-loading');
+
+                let visitsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Kunjungan',
+                            data: [],
+                            borderColor: primaryColor,
+                            backgroundColor: primaryColor + '33',
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: primaryColor,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { 
+                                display: true,
+                                grid: { display: false },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: '#f3f4f6' }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                cornerRadius: 6,
+                            }
+                        }
+                    }
+                });
+
+                function showLoading() {
+                    loadingEl.classList.remove('hidden');
+                }
+
+                function hideLoading() {
+                    loadingEl.classList.add('hidden');
+                }
+
+                function fetchAndUpdate() {
+                    showLoading();
+                    
+                    const range = document.getElementById('chart-range').value;
+                    const auditor = document.getElementById('chart-auditor').value;
+                    const start = document.getElementById('start-date').value;
+                    const end = document.getElementById('end-date').value;
+
+                    const params = new URLSearchParams();
+                    if(range) params.set('range', range);
+                    if(auditor) params.set('auditor_id', auditor);
+                    if(range === 'custom' && start && end) {
+                        params.set('start', start);
+                        params.set('end', end);
+                    }
+
+                    fetch('{{ url('admin/audit/visits-chart-data') }}' + '?' + params.toString(), {
+                        headers: { 
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(payload => {
+                        console.log('Chart data received:', payload);
+                        
+                        if (payload.error) {
+                            throw new Error(payload.message || payload.error);
+                        }
+                        
+                        visitsChart.data.labels = payload.labels || [];
+                        visitsChart.data.datasets[0].data = payload.data || [];
+                        visitsChart.update();
+                        hideLoading();
+                        
+                        if (payload.debug) {
+                            console.log('Debug info:', payload.debug);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Chart fetch error:', err);
+                        hideLoading();
+                        
+                        const errorMsg = err.message || 'Unknown error';
+                        visitsChart.data.labels = [`Error: ${errorMsg}`];
+                        visitsChart.data.datasets[0].data = [0];
+                        visitsChart.update();
+                    });
+                }
+
+                // Handle range change
+                document.getElementById('chart-range').addEventListener('change', (e)=>{
+                    const custom = document.getElementById('custom-dates');
+                    if(e.target.value === 'custom') {
+                        custom.classList.remove('hidden');
+                        custom.classList.add('flex');
+                    } else {
+                        custom.classList.add('hidden');
+                        custom.classList.remove('flex');
+                        fetchAndUpdate(); // Auto-update when changing from custom
+                    }
+                });
+
+                // Handle auditor change
+                document.getElementById('chart-auditor').addEventListener('change', function() {
+                    if(document.getElementById('chart-range').value !== 'custom') {
+                        fetchAndUpdate();
+                    }
+                });
+
+                document.getElementById('update-chart').addEventListener('click', fetchAndUpdate);
+
+                // Initial load
+                setTimeout(fetchAndUpdate, 100);
+            });
+        </script>
+
         <!-- Recent Posts with Filter -->
         <div class="bg-white shadow-sm rounded-lg border border-gray-200 mb-6">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">

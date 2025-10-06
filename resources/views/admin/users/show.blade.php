@@ -51,9 +51,19 @@
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500">Role</dt>
                                     <dd class="mt-1">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $user->role === 'admin' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-800' }}">
-                                            {{ ucfirst($user->role) }}
-                                        </span>
+                                        @if($user->role === 'user')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                                Author
+                                            </span>
+                                        @elseif($user->role === 'auditor')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                                Auditor
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                                                {{ ucfirst($user->role) }}
+                                            </span>
+                                        @endif
                                     </dd>
                                 </div>
                             </div>

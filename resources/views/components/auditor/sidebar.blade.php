@@ -3,38 +3,20 @@
     $menuItems = [
         [
             'name' => 'Dasbor',
-            'route' => 'admin.dashboard',
+            'route' => 'auditor.dashboard',
             'icon' => 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z',
         ],
         [
-            'name' => 'Artikel',
-            'route' => 'admin.posts.index',
-            'icon' =>
-                'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z',
-        ],
-        [
-            'name' => 'Kategori',
-            'route' => 'admin.categories.index',
-            'icon' =>
-                'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z',
-        ],
-        [
-            'name' => 'Komentar',
-            'route' => 'admin.comments.index',
-            'icon' =>
-                'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
-        ],
-        [
-            'name' => 'Audit',
-            'route' => 'admin.audit.index',
+            'name' => 'Daftar Kunjungan',
+            'route' => 'auditor.audit.index',
             'icon' =>
                 'M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
         ],
         [
-            'name' => 'Users',
-            'route' => 'admin.users.index',
+            'name' => 'Rekap Kunjungan',
+            'route' => 'auditor.audit.recap',
             'icon' =>
-                'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m10-6.13a4 4 0 11-8 0 4 4 0 018 0zM7 10a4 4 0 108 0',
+                'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4',
         ],
     ];
 @endphp
@@ -47,7 +29,7 @@
         <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div class="flex-1 px-3 space-y-1 bg-white divide-y divide-gray-200">
                 <ul class="space-y-2 pb-2">
-                    @foreach ($menuItems as $item)
+                                        @foreach ($menuItems as $item)
                         @php
                             $isActive = false;
                             
@@ -55,22 +37,14 @@
                             if ($currentRoute === $item['route']) {
                                 $isActive = true;
                             }
-                            // Check for specific routes
-                            elseif (str_contains($item['route'], 'posts') && str_contains($currentRoute, 'posts')) {
+                            // Check for audit routes specifically
+                            elseif (str_contains($item['route'], 'audit.index') && str_contains($currentRoute, 'audit.index')) {
                                 $isActive = true;
                             }
-                            elseif (str_contains($item['route'], 'categories') && str_contains($currentRoute, 'categories')) {
+                            elseif (str_contains($item['route'], 'audit.recap') && str_contains($currentRoute, 'audit.recap')) {
                                 $isActive = true;
                             }
-                            elseif (str_contains($item['route'], 'comments') && str_contains($currentRoute, 'comments')) {
-                                $isActive = true;
-                            }
-                            elseif (str_contains($item['route'], 'audit') && str_contains($currentRoute, 'audit')) {
-                                $isActive = true;
-                            }
-                            elseif (str_contains($item['route'], 'users') && str_contains($currentRoute, 'users')) {
-                                $isActive = true;
-                            }
+                            // Check for dashboard
                             elseif (str_contains($item['route'], 'dashboard') && str_contains($currentRoute, 'dashboard')) {
                                 $isActive = true;
                             }
@@ -78,9 +52,9 @@
                         <li>
                             <a href="{{ route($item['route']) }}"
                                 class="flex items-center w-full p-2 text-base transition duration-75 rounded-lg group 
-                   {{ $isActive ? 'bg-primary text-white shadow-md' : 'text-gray-900 hover:bg-gray-100 hover:text-primary' }}">
+                                       {{ $isActive ? 'bg-primary text-white shadow-md' : 'text-gray-900 hover:bg-gray-100 hover:text-primary' }}">
                                 <svg class="flex-shrink-0 w-6 h-6 transition duration-75 
-                       {{ $isActive ? 'text-white' : 'text-gray-500 group-hover:text-primary' }}"
+                                           {{ $isActive ? 'text-white' : 'text-gray-500 group-hover:text-primary' }}"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -96,7 +70,6 @@
                             </a>
                         </li>
                     @endforeach
-
                 </ul>
 
                 <div class="space-y-2 pt-2">

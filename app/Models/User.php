@@ -60,11 +60,32 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all visits where this user is the auditor
+     */
+    public function visitsAsAuditor()
+    {
+        return $this->hasMany(Visits::class, 'auditor_id');
+    }
+
+    /**
+     * Get all visits where this user is the author being visited
+     */
+    public function visitsAsAuthor()
+    {
+        return $this->hasMany(Visits::class, 'author_id');
+    }
+
+    /**
      * Check if user is admin
      */
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+
+    public function isAuditor()
+    {
+        return $this->role === 'auditor';
     }
 
     /**

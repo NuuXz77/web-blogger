@@ -9,7 +9,7 @@
         </x-slot:header>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-8">
             <!-- Total Posts -->
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center">

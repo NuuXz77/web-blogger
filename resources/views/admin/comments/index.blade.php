@@ -86,12 +86,20 @@
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 flex-wrap">
                     <select name="status" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                         <option value="">Semua Status</option>
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
                         <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Disetujui</option>
                         <option value="spam" {{ request('status') === 'spam' ? 'selected' : '' }}>Spam</option>
+                    </select>
+                    <select name="post_id" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent min-w-48">
+                        <option value="">Semua Postingan</option>
+                        @foreach($postsWithComments as $post)
+                            <option value="{{ $post->id }}" {{ request('post_id') == $post->id ? 'selected' : '' }}>
+                                {{ Str::limit($post->title, 40) }}
+                            </option>
+                        @endforeach
                     </select>
                     <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition duration-200">
                         Filter

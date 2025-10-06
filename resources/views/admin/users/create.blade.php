@@ -61,8 +61,9 @@
                                 <div>
                                     <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
                                     <select id="role" name="role" class="mt-1 block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-base text-gray-900 transition focus:outline-none focus:ring-2 {{ $errors->has('role') ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500' : 'focus:ring-primary/50 focus:border-primary' }}" required>
-                                        <option value="user" @selected(old('role', 'user') === 'user')>User</option>
-                                        <option value="admin" @selected(old('role') === 'admin')>Admin</option>
+                                        <option value="">Pilih Role</option>
+                                        <option value="user" @selected(old('role') === 'user')>Author</option>
+                                        <option value="auditor" @selected(old('role') === 'auditor')>Auditor</option>
                                     </select>
                                     @error('role')<p class="text-sm text-red-600 mt-2">{{ $message }}</p>@enderror
                                 </div>
