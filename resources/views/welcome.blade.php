@@ -46,7 +46,7 @@
 
                 <div class="flex items-center space-x-4">
                     @auth
-                        <a href="{{ route('admin.dashboard') }}"
+                        <a href="{{ route('dashboard') }}"
                             class="text-gray-700 hover:text-primary transition duration-200">Dasbor</a>
                         @if (auth()->user()->role === 'admin')
                             <a href="{{ route('admin.dashboard') }}"

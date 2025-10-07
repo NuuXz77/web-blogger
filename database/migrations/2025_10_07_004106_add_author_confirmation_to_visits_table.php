@@ -16,8 +16,12 @@ return new class extends Migration
             $table->boolean('author_confirmed')->default(false)->after('status');
             $table->timestamp('author_confirmed_at')->nullable()->after('author_confirmed');
             
+            // Admin confirmation columns
+            $table->boolean('admin_confirmed')->default(false)->after('author_confirmed_at');
+            $table->timestamp('admin_confirmed_at')->nullable()->after('admin_confirmed');
+            
             // Reschedule request columns
-            $table->boolean('reschedule_requested')->default(false)->after('author_confirmed_at');
+            $table->boolean('reschedule_requested')->default(false)->after('admin_confirmed_at');
             $table->text('reschedule_reason')->nullable()->after('reschedule_requested');
             $table->date('preferred_date')->nullable()->after('reschedule_reason');
             $table->string('preferred_time')->nullable()->after('preferred_date');
@@ -37,6 +41,8 @@ return new class extends Migration
             $table->dropColumn([
                 'author_confirmed',
                 'author_confirmed_at',
+                'admin_confirmed',
+                'admin_confirmed_at',
                 'reschedule_requested',
                 'reschedule_reason',
                 'preferred_date',

@@ -137,19 +137,28 @@
                                             <label class="block text-sm font-medium text-gray-500">Status</label>
                                             <div class="mt-1">
                                                 @if ($audit->status === 'pending')
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                        Pending
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        Menunggu Konfirmasi Author
                                                     </span>
-                                                @elseif($audit->status === 'konfirmasi')
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        Konfirmasi
+                                                @elseif($audit->status === 'confirmed_by_author')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        Menunggu Persetujuan Admin
+                                                    </span>
+                                                @elseif($audit->status === 'confirmed_by_admin')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        Siap untuk Dikunjungi
+                                                    </span>
+                                                @elseif($audit->status === 'in_progress')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                        Sedang Berlangsung
+                                                    </span>
+                                                @elseif($audit->status === 'completed')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        Selesai
                                                     </span>
                                                 @else
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        Selesai
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                        {{ ucfirst(str_replace('_', ' ', $audit->status)) }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -221,6 +230,81 @@
                                         </div>
                                     </div>
                                 @endif
+                            </div>
+                        </div>
+
+                        <!-- Actions Section -->
+                        <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                                <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                                    </svg>
+                                    Aksi Kunjungan
+                                </h3>
+                            </div>
+                            <div class="p-6">
+                                <div class="text-center">
+                                    @if($audit->status === 'confirmed_by_admin')
+                                        <div class="mb-4">
+                                            <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800 mb-3">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                Siap untuk Dikunjungi
+                                            </div>
+                                            <p class="text-sm text-gray-600 mb-6">Kunjungan telah disetujui admin. Anda dapat melakukan kunjungan sekarang.</p>
+                                        </div>
+                                        
+                                        <a href="{{ route('auditor.audit.report', $audit) }}" 
+                                           class="inline-flex items-center px-6 py-3 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                            </svg>
+                                            Lakukan Kunjungan
+                                        </a>
+                                    @elseif($audit->status === 'pending')
+                                        <div class="text-yellow-600">
+                                            <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <h4 class="text-lg font-medium mb-2">Menunggu Konfirmasi Author</h4>
+                                            <p class="text-sm text-gray-600">Kunjungan belum dapat dilakukan. Menunggu author mengkonfirmasi jadwal.</p>
+                                        </div>
+                                    @elseif($audit->status === 'confirmed_by_author')
+                                        <div class="text-blue-600">
+                                            <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <h4 class="text-lg font-medium mb-2">Menunggu Persetujuan Admin</h4>
+                                            <p class="text-sm text-gray-600">Author telah konfirmasi. Menunggu admin menyetujui kunjungan.</p>
+                                        </div>
+                                    @elseif($audit->status === 'in_progress')
+                                        <div class="text-orange-600">
+                                            <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <h4 class="text-lg font-medium mb-2">Kunjungan Sedang Berlangsung</h4>
+                                            <p class="text-sm text-gray-600">Kunjungan sedang dalam proses. Menunggu konfirmasi admin.</p>
+                                        </div>
+                                    @elseif($audit->status === 'completed')
+                                        <div class="text-green-600">
+                                            <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            <h4 class="text-lg font-medium mb-2">Kunjungan Selesai</h4>
+                                            <p class="text-sm text-gray-600">Kunjungan telah selesai dan laporan telah disetujui.</p>
+                                        </div>
+                                    @else
+                                        <div class="text-gray-600">
+                                            <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <h4 class="text-lg font-medium mb-2">Status: {{ ucfirst(str_replace('_', ' ', $audit->status)) }}</h4>
+                                            <p class="text-sm text-gray-600">Status kunjungan saat ini.</p>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
 

@@ -37,9 +37,9 @@ class AuditController extends Controller
     }
 
     /**
-     * Confirm the visit schedule by author
+     * Confirm the visit schedule by author (new status flow)
      */
-    public function confirm(Visits $audit)
+    public function authorConfirm(Visits $audit)
     {
         // Only allow author to confirm their own visits
         if ($audit->author_id !== Auth::id()) {
@@ -53,12 +53,39 @@ class AuditController extends Controller
         }
 
         $audit->update([
+            'status' => 'confirmed_by_author',
             'author_confirmed' => true,
             'author_confirmed_at' => now(),
         ]);
 
         return redirect()->back()
-            ->with('success', 'Jadwal audit berhasil dikonfirmasi! Auditor akan segera menghubungi Anda.');
+            ->with('success', 'Jadwal audit berhasil dikonfirmasi! Menunggu persetujuan admin.');
+    }
+
+    /**
+     * Cancel confirmation by author
+     */
+    public function authorCancel(Visits $audit)
+    {
+        // Only allow author to cancel their own visits
+        if ($audit->author_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses untuk membatalkan audit ini.');
+        }
+
+        // Only allow cancellation if status is confirmed_by_author
+        if ($audit->status !== 'confirmed_by_author') {
+            return redirect()->back()
+                ->with('error', 'Audit tidak dapat dibatalkan pada status saat ini.');
+        }
+
+        $audit->update([
+            'status' => 'pending',
+            'author_confirmed' => false,
+            'author_confirmed_at' => null,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Konfirmasi audit berhasil dibatalkan.');
     }
 
     /**

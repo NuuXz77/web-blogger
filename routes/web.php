@@ -8,6 +8,7 @@ use App\Http\Controllers\User\UserPostController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\AuditController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,8 +83,14 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     // User audit routes
     Route::get('/audit', [App\Http\Controllers\User\AuditController::class, 'index'])->name('audit.index');
     Route::get('/audit/{audit}', [App\Http\Controllers\User\AuditController::class, 'show'])->name('audit.show');
-    Route::post('/audit/{audit}/confirm', [App\Http\Controllers\User\AuditController::class, 'confirm'])->name('audit.confirm');
+    // POST routes for actions
+    Route::post('/audit/{audit}/confirm', [App\Http\Controllers\User\AuditController::class, 'authorConfirm'])->name('audit.confirm');
+    Route::post('/audit/{audit}/cancel', [App\Http\Controllers\User\AuditController::class, 'authorCancel'])->name('audit.cancel');
     Route::post('/audit/{audit}/request-reschedule', [App\Http\Controllers\User\AuditController::class, 'requestReschedule'])->name('audit.request-reschedule');
+    // Redirect GET confirm attempts to show page to prevent errors
+    Route::get('/audit/{audit}/confirm', function($audit) {
+        return redirect()->route('user.audit.show', $audit)->with('error', 'Gunakan tombol konfirmasi yang disediakan.');
+    });
 });
 // Admin routes (admin role only)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -116,6 +123,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users/{user}', [AdminUserController::class, 'adminShow'])->name('users.show');
     Route::get('/users-search', [AdminUserController::class, 'search'])->name('users.search');
     
+    // System Logs management
+    Route::get('/logs', [App\Http\Controllers\Admin\LogController::class, 'index'])->name('logs.index');
+    Route::post('/logs/clear', [App\Http\Controllers\Admin\LogController::class, 'clear'])->name('logs.clear');
+    Route::get('/logs/download', [App\Http\Controllers\Admin\LogController::class, 'download'])->name('logs.download');
+    Route::get('/logs/stats', [App\Http\Controllers\Admin\LogController::class, 'stats'])->name('logs.stats');
+    
     // Audit/Visits management
     // Chart data endpoint for visits (for admin dashboard) - MUST be before resource route
     Route::get('/audit/visits-chart-data', [App\Http\Controllers\AuditController::class, 'visitsChartData'])->name('audit.chart-data');
@@ -123,10 +136,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('audit', App\Http\Controllers\AuditController::class);
     Route::post('/audit/{audit}/approve', [App\Http\Controllers\AuditController::class, 'approve'])->name('audit.approve');
     Route::post('/audit/{audit}/reject', [App\Http\Controllers\AuditController::class, 'reject'])->name('audit.reject');
-    Route::post('/audit/{audit}/confirm', [App\Http\Controllers\AuditController::class, 'confirmReport'])->name('audit.confirm');
+    Route::post('/audit/{audit}/confirm', [App\Http\Controllers\AuditController::class, 'adminConfirm'])->name('audit.confirm');
+    Route::post('/audit/{audit}/admin-reject', [App\Http\Controllers\AuditController::class, 'adminReject'])->name('audit.admin-reject');
+    Route::post('/audit/{audit}/confirm-report', [App\Http\Controllers\AuditController::class, 'confirmReport'])->name('audit.confirm-report');
     Route::post('/audit/{audit}/reject-report', [App\Http\Controllers\AuditController::class, 'rejectReport'])->name('audit.reject-report');
     Route::post('/audit/{audit}/approve-reschedule', [App\Http\Controllers\AuditController::class, 'approveReschedule'])->name('audit.approve-reschedule');
     Route::post('/audit/{audit}/reject-reschedule', [App\Http\Controllers\AuditController::class, 'rejectReschedule'])->name('audit.reject-reschedule');
+    Route::get('/admin/audit/export', [AuditController::class, 'exportExcel'])
+    ->name('audit.export');
     
     // Debug route to test chart data (remove this later)
     Route::get('/debug-chart', function() {

@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Exports\AuditReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AuditController extends Controller
 {
@@ -53,7 +55,7 @@ class AuditController extends Controller
             'tanggal' => $request->tanggal,
             'alamat' => $request->alamat,
             'keterangan' => $request->keterangan,
-            'status' => 'pending',
+            'status' => 'pending', // Author belum konfirmasi
         ]);
 
         return redirect()->route('admin.audit.index')
@@ -91,7 +93,7 @@ class AuditController extends Controller
             'tanggal' => 'required|date',
             'alamat' => 'required|string',
             'keterangan' => 'nullable|string',
-            'status' => 'in:pending,konfirmasi,selesai',
+            'status' => 'in:pending,confirmed_by_author,confirmed_by_admin,in_progress,completed',
         ]);
 
         $audit->update($request->only([
@@ -103,7 +105,7 @@ class AuditController extends Controller
     }
 
     /**
-     * Confirm auditor report (admin only)
+     * Confirm auditor report (admin only) - Final approval
      */
     public function confirmReport(Visits $audit)
     {
@@ -112,18 +114,19 @@ class AuditController extends Controller
             abort(403);
         }
 
-        // Only allow confirmation if status is 'konfirmasi'
-        if ($audit->status !== 'konfirmasi') {
+        // Only allow confirmation if status is 'in_progress'
+        if ($audit->status !== 'in_progress') {
             return redirect()->back()
                 ->with('error', 'Laporan tidak dapat dikonfirmasi pada status saat ini.');
         }
 
         $audit->update([
-            'status' => 'selesai'
+            'status' => 'completed',
+            'admin_final_approved_at' => now(),
         ]);
 
         return redirect()->route('admin.audit.index')
-            ->with('success', 'Laporan kunjungan berhasil dikonfirmasi!');
+            ->with('success', 'Laporan kunjungan berhasil dikonfirmasi dan audit selesai!');
     }
 
     /**
@@ -136,8 +139,8 @@ class AuditController extends Controller
             abort(403);
         }
 
-        // Only allow rejection if status is 'konfirmasi'
-        if ($audit->status !== 'konfirmasi') {
+        // Only allow rejection if status is 'in_progress'
+        if ($audit->status !== 'in_progress') {
             return redirect()->back()
                 ->with('error', 'Laporan tidak dapat ditolak pada status saat ini.');
         }
@@ -147,8 +150,13 @@ class AuditController extends Controller
         ]);
 
         $audit->update([
-            'status' => 'pending',
-            'rejection_reason' => $request->rejection_reason
+            'status' => 'confirmed_by_admin', // Return to confirmed status
+            'rejection_reason' => $request->rejection_reason,
+            'hasil' => null,
+            'selfie' => null,
+            'lat' => null,
+            'long' => null,
+            'visited_at' => null,
         ]);
 
         return redirect()->route('admin.audit.index')
@@ -226,6 +234,111 @@ class AuditController extends Controller
     }
 
     /**
+     * Author confirms availability for audit
+     */
+    public function authorConfirm(Visits $audit)
+    {
+        // Only allow author to confirm their own audit
+        if ($audit->author_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Only allow confirmation if status is 'pending'
+        if ($audit->status !== 'pending') {
+            return redirect()->back()
+                ->with('error', 'Audit tidak dapat dikonfirmasi pada status saat ini.');
+        }
+
+        $audit->update([
+            'status' => 'confirmed_by_author',
+            'author_confirmed_at' => now(),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Kehadiran berhasil dikonfirmasi! Menunggu persetujuan admin.');
+    }
+
+    /**
+     * Author cancels/rejects audit
+     */
+    public function authorCancel(Visits $audit)
+    {
+        // Only allow author to cancel their own audit
+        if ($audit->author_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Only allow cancellation if status is 'pending'
+        if ($audit->status !== 'pending') {
+            return redirect()->back()
+                ->with('error', 'Audit tidak dapat dibatalkan pada status saat ini.');
+        }
+
+        $audit->update([
+            'status' => 'cancelled_by_author',
+            'author_cancelled_at' => now(),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Audit dibatalkan. Admin akan meninjau ulang jadwal.');
+    }
+
+    /**
+     * Admin confirms author's confirmation (approve to proceed)
+     */
+    public function adminConfirm(Visits $audit)
+    {
+        // Only allow admin to confirm
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        // Only allow confirmation if author has confirmed
+        if ($audit->status !== 'confirmed_by_author') {
+            return redirect()->back()
+                ->with('error', 'Author belum mengkonfirmasi atau status tidak sesuai.');
+        }
+
+        $audit->update([
+            'status' => 'confirmed_by_admin',
+            'admin_confirmed_at' => now(),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Audit disetujui! Auditor sekarang dapat melakukan kunjungan.');
+    }
+
+    /**
+     * Admin rejects author's confirmation
+     */
+    public function adminReject(Request $request, Visits $audit)
+    {
+        // Only allow admin to reject
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        // Only allow rejection if author has confirmed
+        if ($audit->status !== 'confirmed_by_author') {
+            return redirect()->back()
+                ->with('error', 'Author belum mengkonfirmasi atau status tidak sesuai.');
+        }
+
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        $audit->update([
+            'status' => 'pending',
+            'rejection_reason' => $request->rejection_reason,
+            'author_confirmed_at' => null,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Konfirmasi author ditolak dan dikembalikan ke status pending.');
+    }
+
+    /**
      * Remove the specified visit from storage
      */
     public function destroy(Visits $audit)
@@ -287,6 +400,12 @@ class AuditController extends Controller
             abort(403);
         }
 
+        // Only allow report if admin has confirmed
+        if ($audit->status !== 'confirmed_by_admin') {
+            return redirect()->route('auditor.audit.show', $audit)
+                ->with('error', 'Kunjungan belum disetujui admin. Tidak dapat melakukan laporan.');
+        }
+
         return view('auditor.audit.report', compact('audit'));
     }
 
@@ -311,6 +430,12 @@ class AuditController extends Controller
         // Only allow auditor to report their own visits
         if ($audit->auditor_id !== Auth::id()) {
             abort(403);
+        }
+
+        // Only allow report if admin has confirmed
+        if ($audit->status !== 'confirmed_by_admin') {
+            return redirect()->back()
+                ->with('error', 'Kunjungan belum disetujui admin. Tidak dapat melakukan laporan.');
         }
 
         $request->validate([
@@ -343,11 +468,12 @@ class AuditController extends Controller
             'selfie' => $filePath,
             'lat' => $request->lat,
             'long' => $request->long,
-            'status' => 'konfirmasi', // Change status to konfirmasi for admin approval
+            'status' => 'in_progress', // Change to in_progress, waiting for admin final approval
+            'visited_at' => now(),
         ]);
 
         return redirect()->route('auditor.audit.index')
-            ->with('success', 'Laporan kunjungan berhasil disimpan dan menunggu konfirmasi admin!');
+            ->with('success', 'Laporan kunjungan berhasil disimpan dan menunggu konfirmasi final admin!');
     }
 
     /**
@@ -572,5 +698,22 @@ class AuditController extends Controller
                 'data' => [0]
             ], 500);
         }
+    }
+
+    /**
+     * Export visits data to Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        $dateFrom = $request->date_from;
+        $dateTo = $request->date_to;
+        $status = $request->status;
+        
+        $filename = 'laporan_audit_' . date('Y-m-d_H-i-s') . '.xlsx';
+        
+        return Excel::download(
+            new AuditReportExport($dateFrom, $dateTo, $status), 
+            $filename
+        );
     }
 }

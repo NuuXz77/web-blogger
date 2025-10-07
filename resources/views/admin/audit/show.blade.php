@@ -181,10 +181,15 @@
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                         Pending
                                                     </span>
-                                                @elseif($audit->status === 'konfirmasi')
+                                                @elseif($audit->status === 'confirmed_by_author')
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                                                        Dikonfirmasi (Author)
+                                                    </span>
+                                                @elseif($audit->status === 'confirmed_by_admin')
                                                     <span
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        Konfirmasi
+                                                        Dikonfirmasi (Admin)
                                                     </span>
                                                 @else
                                                     <span
