@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-50">
         <!-- Main Content -->
         <div class="flex-1">
-            <div class="max-w-5xl mt-6">
+            <div class="mt-6">
                 <!-- Header -->
                 <x-slot:header>
                     <div>
@@ -135,20 +135,35 @@
                                         <div>
                                             <label class="block text-sm font-medium text-gray-500">Status</label>
                                             <div class="mt-1">
-                                                @if ($audit->status === 'pending')
+                                                @if ($audit->rejection_reason)
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        Permintaan Jadwal Ditolak
+                                                    </span>
+                                                @elseif ($audit->status === 'pending')
                                                     <span
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                         Menunggu Konfirmasi Anda
                                                     </span>
-                                                @elseif($audit->status === 'konfirmasi')
+                                                @elseif($audit->status === 'confirmed_by_author')
                                                     <span
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        Dalam Proses
+                                                        Telah Dikonfirmasi
+                                                    </span>
+                                                @elseif($audit->status === 'confirmed_by_admin')
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        Dikonfirmasi Admin
+                                                    </span>
+                                                @elseif($audit->status === 'in_progress')
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        Audit Telah Ditugaskan
                                                     </span>
                                                 @else
                                                     <span
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        Selesai
+                                                        Audit Selesai
                                                     </span>
                                                 @endif
                                             </div>
@@ -259,7 +274,30 @@
                                 <h3 class="text-sm font-semibold text-gray-900">Aksi</h3>
                             </div>
                             <div class="p-4 space-y-3">
-                                @if($audit->status === 'pending')
+                                @if($audit->rejection_reason)
+                                    <div class="text-center py-3">
+                                        <div class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800 mb-3">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                            Permintaan Jadwal Ditolak
+                                        </div>
+                                        <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+                                            <p class="text-sm text-red-800 font-medium mb-1">Alasan Penolakan:</p>
+                                            <p class="text-sm text-red-700">{{ $audit->rejection_reason }}</p>
+                                        </div>
+                                        <p class="text-xs text-red-600">Anda dapat mengajukan permintaan jadwal baru</p>
+                                        
+                                        <!-- Button untuk request jadwal baru -->
+                                        <button onclick="openRescheduleModal()" 
+                                                class="mt-3 w-full inline-flex items-center justify-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-700 active:bg-orange-900 focus:outline-none focus:border-orange-900 focus:ring ring-orange-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            Ajukan Jadwal Baru
+                                        </button>
+                                    </div>
+                                @elseif($audit->status === 'pending')
                                     <div class="space-y-3">
                                         <!-- Confirm Button with Modal -->
                                         <button onclick="openConfirmModal()" 
@@ -287,10 +325,14 @@
                                             </svg>
                                             Menunggu Persetujuan Admin
                                         </div>
-                                        <p class="text-xs text-blue-500 mb-4">Konfirmasi Anda sedang ditinjau admin</p>
+                                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                            <p class="text-sm text-blue-800 font-medium mb-1">⏳ Status Audit</p>
+                                            <p class="text-sm text-blue-700">Konfirmasi Anda telah diterima. Admin sedang meninjau dan akan segera memberikan persetujuan.</p>
+                                        </div>
+                                        <p class="text-xs text-blue-600 mb-3">Anda dapat membatalkan konfirmasi jika diperlukan</p>
                                         
                                         <!-- Cancel confirmation button -->
-                                        <form action="{{ route('user.audit.cancel', $audit) }}" method="POST" class="inline">
+                                        {{-- <form action="{{ route('audit.cancel', $audit) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit" 
                                                     onclick="return confirm('Yakin ingin membatalkan konfirmasi? Status akan kembali ke pending.')"
@@ -300,17 +342,21 @@
                                                 </svg>
                                                 Batalkan Konfirmasi
                                             </button>
-                                        </form>
+                                        </form> --}}
                                     </div>
                                 @elseif($audit->status === 'confirmed_by_admin')
                                     <div class="text-center py-3">
-                                        <div class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                        <div class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800 mb-3">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            Audit Disetujui
+                                            Audit Disetujui Admin
                                         </div>
-                                        <p class="text-xs text-green-500 mt-2">Menunggu kunjungan auditor</p>
+                                        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                                            <p class="text-sm text-green-800 font-medium mb-1">✅ Status Audit</p>
+                                            <p class="text-sm text-green-700">Jadwal audit Anda telah disetujui oleh admin. Auditor akan segera melakukan kunjungan sesuai jadwal yang telah ditentukan.</p>
+                                        </div>
+                                        <p class="text-xs text-green-600">Tidak ada action yang diperlukan</p>
                                     </div>
                                 @elseif($audit->status === 'in_progress')
                                     <div class="text-center py-3">

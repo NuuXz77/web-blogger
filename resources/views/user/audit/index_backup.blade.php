@@ -2,18 +2,16 @@
     <div class="min-h-screen bg-gray-50">
         <!-- Main Content -->
         <div class="flex-1">
-            <div>
-                <x-slot:header>
-                    <!-- Header -->
-                    <div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h1 class="text-3xl font-bold text-gray-900">Daftar Audit Saya</h1>
-                                <p class="text-gray-600 mt-2">Semua jadwal audit yang akan dilakukan di tempat Anda</p>
-                            </div>
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">Daftar Audit Saya</h1>
+                            <p class="text-gray-600 mt-2">Semua jadwal audit yang akan dilakukan di tempat Anda</p>
                         </div>
                     </div>
-                </x-slot:header>
+                </div>
 
                 <!-- Success Message -->
                 @if (session('success'))
@@ -30,8 +28,8 @@
                 @endif
 
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-                    <div class="b g-white p-6 rounded-lg shadow-sm border">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-gray-600">Total Audit</p>

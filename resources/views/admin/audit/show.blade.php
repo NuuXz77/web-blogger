@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-50">
         <!-- Main Content -->
         <div class="flex-1">
-            <div class="max-w-5xl mt-6">
+            <div class="mt-6">
                 <!-- Header -->
                 <x-slot:header>
                     <div>
@@ -15,35 +15,46 @@
                             </div>
 
                             <div class="flex items-center space-x-3">
-                                @if ($audit->status === 'konfirmasi')
-                                    <form action="{{ route('admin.audit.approve', $audit) }}" method="POST"
-                                        class="inline">
-                                        @csrf
-                                        <button type="submit"
-                                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm"
-                                            onclick="return confirm('Apakah Anda yakin ingin menyetujui kunjungan ini?')">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                @if ($audit->status === 'confirmed_by_author')
+                                    <!-- Button Setujui Jadwal Saat Ini -->
+                                    @if (!$audit->reschedule_requested)
+                                        <form action="{{ route('admin.audit.confirm', $audit) }}" method="POST"
+                                            class="inline">
+                                            @csrf
+                                            <button type="submit"
+                                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm"
+                                                onclick="return confirm('Apakah Anda yakin ingin menyetujui jadwal kunjungan saat ini?')">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                Setujui Jadwal
+                                            </button>
+                                        </form>
+                                    @endif
+                                    
+                                    <!-- Button Konfirmasi Reschedule - hanya muncul jika ada permintaan reschedule -->
+                                    @if ($audit->reschedule_requested)
+                                        <button type="button" onclick="openApproveRescheduleModal({{ $audit->id }}, '{{ $audit->preferred_date }}', '{{ $audit->preferred_time }}')"
+                                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 13l4 4L19 7"></path>
+                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
                                             </svg>
-                                            Setujui
+                                            Konfirmasi Reschedule
                                         </button>
-                                    </form>
-                                    <form action="{{ route('admin.audit.reject', $audit) }}" method="POST"
-                                        class="inline">
-                                        @csrf
-                                        <button type="submit"
-                                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm"
-                                            onclick="return confirm('Apakah Anda yakin ingin menolak kunjungan ini?')">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                        
+                                        <button type="button" onclick="openRejectRescheduleModal({{ $audit->id }})"
+                                            class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 text-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M6 18L18 6M6 6l12 12"></path>
                                             </svg>
-                                            Tolak
+                                            Tolak Reschedule
                                         </button>
-                                    </form>
+                                    @endif
                                 @endif
 
                                 <a href="{{ route('admin.audit.edit', $audit) }}"
@@ -73,6 +84,28 @@
                 @if (session('success'))
                     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
                         {{ session('success') }}
+                    </div>
+                @endif
+
+                <!-- Info Alert untuk Status Konfirmasi -->
+                @if ($audit->status === 'confirmed_by_author')
+                    <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded mb-6">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <h4 class="font-medium">Menunggu Konfirmasi Admin</h4>
+                                <div class="mt-1 text-sm">
+                                    @if (!$audit->reschedule_requested)
+                                        <p>• <strong>Setujui Jadwal:</strong> Konfirmasi kunjungan pada jadwal yang telah ditentukan</p>
+                                    @endif
+                                    @if ($audit->reschedule_requested)
+                                        <p>• <strong>Konfirmasi Reschedule:</strong> Setujui/tolak permintaan perubahan jadwal dari user</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 @endif
 
@@ -247,6 +280,55 @@
                                         </div>
                                     </div>
                                 @endif
+                                
+                                <!-- Reschedule Request Information -->
+                                @if ($audit->reschedule_requested)
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div
+                                                class="h-10 w-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <label class="block text-sm font-medium text-gray-500">Permintaan Reschedule dari User</label>
+                                            <div class="mt-1 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                                                <div class="space-y-2">
+                                                    @if($audit->preferred_date)
+                                                    <div class="flex justify-between">
+                                                        <span class="text-sm font-medium text-orange-800">Tanggal Baru:</span>
+                                                        <span class="text-sm text-orange-700">{{ \Carbon\Carbon::parse($audit->preferred_date)->format('d F Y') }}</span>
+                                                    </div>
+                                                    @endif
+                                                    @if($audit->preferred_time)
+                                                    <div class="flex justify-between">
+                                                        <span class="text-sm font-medium text-orange-800">Waktu:</span>
+                                                        <span class="text-sm text-orange-700">{{ $audit->preferred_time }}</span>
+                                                    </div>
+                                                    @endif
+                                                    @if($audit->reschedule_reason)
+                                                    <div>
+                                                        <span class="text-sm font-medium text-orange-800">Alasan:</span>
+                                                        <p class="text-sm text-orange-700 mt-1">{{ $audit->reschedule_reason }}</p>
+                                                    </div>
+                                                    @endif
+                                                    @if($audit->reschedule_requested_at)
+                                                    <div class="flex justify-between">
+                                                        <span class="text-sm font-medium text-orange-800">Diminta pada:</span>
+                                                        <span class="text-sm text-orange-700">{{ \Carbon\Carbon::parse($audit->reschedule_requested_at)->format('d M Y, H:i') }}</span>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -271,7 +353,7 @@
                                             </div>
                                             <div class="flex-1">
                                                 <h4 class="text-sm font-medium text-orange-900">Permintaan Perubahan Jadwal</h4>
-                                                <p class="text-sm text-orange-700 mt-1">Author meminta perubahan jadwal pada {{ $audit->reschedule_requested_at->format('d M Y, H:i') }}</p>
+                                                <p class="text-sm text-orange-700 mt-1">Author meminta perubahan jadwal pada {{ $audit->reschedule_requested_at ? \Carbon\Carbon::parse($audit->reschedule_requested_at)->format('d M Y, H:i') : '-' }}</p>
                                                 
                                                 <div class="mt-3 space-y-2">
                                                     <div>
@@ -588,7 +670,7 @@
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Setujui Perubahan Jadwal</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Konfirmasi Reschedule</h3>
                     <button type="button" onclick="closeApproveRescheduleModal()" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -596,13 +678,23 @@
                     </button>
                 </div>
                 
-                <form id="approveRescheduleForm" method="POST">
+                <!-- Info permintaan reschedule -->
+                <div class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <h4 class="text-sm font-medium text-blue-900 mb-2">Detail Permintaan Reschedule:</h4>
+                    <div class="text-sm text-blue-700 space-y-1">
+                        <div>📅 <strong>Tanggal yang diminta:</strong> <span id="requested-date-display"></span></div>
+                        <div>⏰ <strong>Waktu yang diminta:</strong> <span id="requested-time-display"></span></div>
+                    </div>
+                </div>
+                
+                <form action="{{ route('admin.audit.confirm', $audit) }}" id="approveRescheduleForm" method="POST">
                     @csrf
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Baru *</label>
                         <input type="date" name="tanggal" id="approve_tanggal" required
                                min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}"
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Anda dapat mengubah tanggal jika diperlukan</p>
                     </div>
                     
                     <div class="mb-4">
@@ -610,6 +702,7 @@
                         <input type="text" name="waktu" id="approve_waktu"
                                placeholder="Contoh: 09:00 - 12:00"
                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Anda dapat mengubah waktu jika diperlukan</p>
                     </div>
                     
                     <div class="flex justify-end space-x-3">
@@ -619,7 +712,7 @@
                         </button>
                         <button type="submit"
                                 class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                            Setujui & Update Jadwal
+                            Setujui Reschedule
                         </button>
                     </div>
                 </form>
@@ -670,8 +763,27 @@
         // Modal untuk approve reschedule
         function openApproveRescheduleModal(visitId, preferredDate, preferredTime) {
             document.getElementById('approveRescheduleForm').action = `/admin/audit/${visitId}/approve-reschedule`;
-            document.getElementById('approve_tanggal').value = preferredDate;
-            document.getElementById('approve_waktu').value = preferredTime;
+            document.getElementById('approve_tanggal').value = preferredDate || '';
+            document.getElementById('approve_waktu').value = preferredTime || '';
+            
+            // Update display info
+            const dateDisplay = document.getElementById('requested-date-display');
+            const timeDisplay = document.getElementById('requested-time-display');
+            
+            if (preferredDate) {
+                const date = new Date(preferredDate);
+                dateDisplay.textContent = date.toLocaleDateString('id-ID', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            } else {
+                dateDisplay.textContent = 'Tidak disebutkan';
+            }
+            
+            timeDisplay.textContent = preferredTime || 'Tidak disebutkan';
+            
             document.getElementById('approveRescheduleModal').classList.remove('hidden');
         }
 

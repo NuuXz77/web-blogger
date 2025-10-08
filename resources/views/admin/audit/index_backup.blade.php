@@ -282,12 +282,12 @@
                                         @elseif($visit->status === 'confirmed_by_admin')
                                             <span
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                Dikonfirmasi (Admin)
+                                                Konfirmasi
                                             </span>
                                         @elseif($visit->status === 'confirmed_by_author')
                                             <span
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                Perlu Konfirmasi (Author)
+                                                Perlu Konfirmasi (Auditor)
                                             </span>
                                         @elseif($visit->status === 'in_progress')
                                             <span
@@ -347,7 +347,7 @@
                                                     </a>
 
                                                     <!-- Status-specific actions -->
-                                                    @if ($visit->status === 'confirmed_by_author' && $visit->reschedule_requested === 1)
+                                                    @if ($visit->status === 'confirmed_by_author')
                                                         <form action="{{ route('admin.audit.confirm', $visit) }}"
                                                             method="POST" class="block">
                                                             @csrf

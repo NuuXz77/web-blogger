@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-50">
         <!-- Main Content -->
         <div class="flex-1">
-            <div class="max-w-5xl mt-6">
+            <div class="    mt-6">
                 <!-- Header -->
                 <x-slot:header>
                     <div>

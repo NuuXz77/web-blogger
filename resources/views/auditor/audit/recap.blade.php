@@ -3,26 +3,28 @@
         <div class="flex">
             <!-- Main Content -->
             <div class="flex-1">
-                <div class="max-w-7xl mx-auto">
-                    <!-- Header -->
-                    <div class="mb-8">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h1 class="text-3xl font-bold text-gray-900">Rekap Kunjungan</h1>
-                                <p class="text-gray-600 mt-2">Peta perjalanan dan riwayat kunjungan Anda</p>
+                <div>
+                    <x-slot:header>
+                        <!-- Header -->
+                        <div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h1 class="text-3xl font-bold text-gray-900">Rekap Kunjungan</h1>
+                                    <p class="text-gray-600 mt-2">Peta perjalanan dan riwayat kunjungan Anda</p>
+                                </div>
+                                <a href="{{ route('auditor.audit.index') }}" 
+                                   class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    </svg>
+                                    Kembali ke Daftar
+                                </a>
                             </div>
-                            <a href="{{ route('auditor.audit.index') }}" 
-                               class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                                </svg>
-                                Kembali ke Daftar
-                            </a>
                         </div>
-                    </div>
+                    </x-slot:header>
 
                     <!-- Stats Summary -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 mt-6">
                         <div class="bg-white p-6 rounded-lg shadow-sm border">
                             <div class="flex items-center justify-between">
                                 <div>

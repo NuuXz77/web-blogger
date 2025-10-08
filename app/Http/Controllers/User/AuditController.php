@@ -56,6 +56,7 @@ class AuditController extends Controller
             'status' => 'confirmed_by_author',
             'author_confirmed' => true,
             'author_confirmed_at' => now(),
+            'rejection_reason' => null, // Clear previous rejection
         ]);
 
         return redirect()->back()
@@ -115,7 +116,9 @@ class AuditController extends Controller
             'reschedule_reason' => $request->reschedule_reason,
             'preferred_date' => $request->preferred_date,
             'preferred_time' => $request->preferred_time,
+            'status' => 'confirmed_by_author',
             'reschedule_requested_at' => now(),
+            'rejection_reason' => null, // Clear previous rejection
         ]);
 
         return redirect()->back()

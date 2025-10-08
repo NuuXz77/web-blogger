@@ -44,7 +44,7 @@ class AuditController extends Controller
         $request->validate([
             'author_id' => 'required|exists:users,id',
             'auditor_id' => 'required|exists:users,id',
-            'tanggal' => 'required|date',
+            'tanggal' => 'required|date|after:today',
             'alamat' => 'required|string',
             'keterangan' => 'nullable|string',
         ]);
@@ -55,11 +55,11 @@ class AuditController extends Controller
             'tanggal' => $request->tanggal,
             'alamat' => $request->alamat,
             'keterangan' => $request->keterangan,
-            'status' => 'pending', // Author belum konfirmasi
+            'status' => 'waiting_author', // Status awal: menunggu konfirmasi author
         ]);
 
         return redirect()->route('admin.audit.index')
-            ->with('success', 'Kunjungan berhasil dibuat!');
+            ->with('success', 'Jadwal audit berhasil dibuat! Author akan mendapat notifikasi untuk konfirmasi.');
     }
 
     /**
@@ -82,7 +82,7 @@ class AuditController extends Controller
         return view('admin.audit.edit', compact('audit', 'auditors', 'authors'));
     }
 
-    /**
+        /**
      * Update the specified visit in storage
      */
     public function update(Request $request, Visits $audit)
@@ -93,7 +93,7 @@ class AuditController extends Controller
             'tanggal' => 'required|date',
             'alamat' => 'required|string',
             'keterangan' => 'nullable|string',
-            'status' => 'in:pending,confirmed_by_author,confirmed_by_admin,in_progress,completed',
+            'status' => 'in:waiting_author,waiting_reschedule,ready_for_audit,in_progress,completed',
         ]);
 
         $audit->update($request->only([
@@ -101,7 +101,7 @@ class AuditController extends Controller
         ]));
 
         return redirect()->route('admin.audit.index')
-            ->with('success', 'Kunjungan berhasil diperbarui!');
+            ->with('success', 'Data audit berhasil diperbarui.');
     }
 
     /**
@@ -164,19 +164,19 @@ class AuditController extends Controller
     }
 
     /**
-     * Approve reschedule request from author
+     * Admin approve reschedule request from author (clearer method name)
      */
-    public function approveReschedule(Request $request, Visits $audit)
+    public function approveRescheduleRequest(Request $request, Visits $audit)
     {
         // Only allow admin to approve reschedule
         if (Auth::user()->role !== 'admin') {
-            abort(403);
+            abort(403, 'Hanya admin yang dapat menyetujui perubahan jadwal.');
         }
 
-        // Only allow if there's a reschedule request
-        if (!$audit->reschedule_requested) {
+        // Only allow if status is waiting_reschedule
+        if ($audit->status !== 'waiting_reschedule') {
             return redirect()->back()
-                ->with('error', 'Tidak ada permintaan perubahan jadwal untuk audit ini.');
+                ->with('error', 'Tidak ada permintaan perubahan jadwal yang perlu disetujui.');
         }
 
         $request->validate([
@@ -186,19 +186,79 @@ class AuditController extends Controller
 
         $audit->update([
             'tanggal' => $request->tanggal,
-            'status' => 'pending', // Reset status to pending so user can confirm again
+            'waktu' => $request->waktu,
+            'status' => 'ready_for_audit',
             'reschedule_requested' => false,
             'reschedule_reason' => null,
             'preferred_date' => null,
             'preferred_time' => null,
             'reschedule_requested_at' => null,
-            'rejection_reason' => null,
-            'keterangan' => $audit->keterangan . "\n\nJadwal diperbarui oleh admin pada " . now()->format('d M Y, H:i') . 
-                          ($request->waktu ? " - Waktu: " . $request->waktu : ""),
+            'admin_approved_schedule' => true,
+            'admin_approved_schedule_at' => now(),
         ]);
 
         return redirect()->route('admin.audit.index')
-            ->with('success', 'Permintaan perubahan jadwal disetujui dan jadwal berhasil diperbarui!');
+            ->with('success', 'Perubahan jadwal disetujui! Audit siap dilaksanakan auditor.');
+    }
+
+    /**
+     * Admin reject reschedule request from author (clearer method name)
+     */
+    public function rejectRescheduleRequest(Request $request, Visits $audit)
+    {
+        // Only allow admin to reject reschedule
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Hanya admin yang dapat menolak perubahan jadwal.');
+        }
+
+        // Only allow if status is waiting_reschedule
+        if ($audit->status !== 'waiting_reschedule') {
+            return redirect()->back()
+                ->with('error', 'Tidak ada permintaan perubahan jadwal yang perlu ditolak.');
+        }
+
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        $audit->update([
+            'status' => 'waiting_author',
+            'reschedule_requested' => false,
+            'reschedule_reason' => null,
+            'preferred_date' => null,
+            'preferred_time' => null,
+            'reschedule_requested_at' => null,
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        return redirect()->route('admin.audit.index')
+            ->with('success', 'Permintaan perubahan jadwal ditolak. Author harus konfirmasi ulang dengan jadwal asli.');
+    }
+
+    /**
+     * Admin approve author confirmation (final approval for audit to start)
+     */
+    public function approveAuthorConfirmation(Visits $audit)
+    {
+        // Only allow admin
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Hanya admin yang dapat menyetujui jadwal audit.');
+        }
+
+        // Only allow if author already confirmed (status waiting_author but author_confirmed = true)
+        if ($audit->status !== 'waiting_author' || !$audit->author_confirmed) {
+            return redirect()->back()
+                ->with('error', 'Author belum mengkonfirmasi jadwal audit.');
+        }
+
+        $audit->update([
+            'status' => 'ready_for_audit',
+            'admin_approved_schedule' => true,
+            'admin_approved_schedule_at' => now(),
+        ]);
+
+        return redirect()->route('admin.audit.index')
+            ->with('success', 'Jadwal audit disetujui! Auditor sekarang dapat melaksanakan kunjungan.');
     }
 
     /**
@@ -228,37 +288,28 @@ class AuditController extends Controller
             'preferred_time' => null,
             'reschedule_requested_at' => null,
             'rejection_reason' => $request->rejection_reason,
-            'status' => 'pending', // Set back to pending so user can take action
         ]);
 
         return redirect()->route('admin.audit.index')
-            ->with('success', 'Permintaan perubahan jadwal ditolak!');
+            ->with('success', 'Permintaan perubahan jadwal ditolak. Author harus konfirmasi ulang dengan jadwal asli.');
     }
 
     /**
-     * Author confirms availability for audit
+     * Remove the specified visit from storage
      */
-    public function authorConfirm(Visits $audit)
+    public function destroy(Visits $audit)
     {
-        // Only allow author to confirm their own audit
-        if ($audit->author_id !== Auth::id()) {
-            abort(403);
+        if ($audit->selfie) {
+            Storage::delete($audit->selfie);
         }
+        
+        $audit->delete();
 
-        // Only allow confirmation if status is 'pending'
-        if ($audit->status !== 'pending') {
-            return redirect()->back()
-                ->with('error', 'Audit tidak dapat dikonfirmasi pada status saat ini.');
-        }
-
-        $audit->update([
-            'status' => 'confirmed_by_author',
-            'author_confirmed_at' => now(),
-        ]);
-
-        return redirect()->back()
-            ->with('success', 'Kehadiran berhasil dikonfirmasi! Menunggu persetujuan admin.');
+        return redirect()->route('admin.audit.index')
+            ->with('success', 'Audit berhasil dihapus.');
     }
+
+    // === AUDITOR METHODS ===
 
     /**
      * Author cancels/rejects audit
@@ -341,29 +392,16 @@ class AuditController extends Controller
     }
 
     /**
-     * Remove the specified visit from storage
+     * Display a listing of visits for auditor
      */
-    public function destroy(Visits $audit)
+    public function auditorIndex()
     {
-        if ($audit->selfie) {
-            Storage::delete($audit->selfie);
-        }
+        $visits = Visits::with(['auditor', 'author'])
+            ->where('auditor_id', Auth::id())
+            ->orderBy('tanggal', 'desc')
+            ->paginate(10);
         
-        $audit->delete();
-
-        return redirect()->route('admin.audit.index')
-            ->with('success', 'Kunjungan berhasil dihapus!');
-    }
-
-    /**
-     * Approve visit (change status to selesai)
-     */
-    public function approve(Visits $audit)
-    {
-        $audit->update(['status' => 'selesai']);
-        
-        return redirect()->back()
-            ->with('success', 'Kunjungan berhasil di-ACC!');
+        return view('auditor.audit.index', compact('visits'));
     }
 
     /**

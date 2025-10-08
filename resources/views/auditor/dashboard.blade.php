@@ -3,12 +3,14 @@
         <div class="flex">   
             <!-- Main Content -->
             <div class="flex-1">
-                <div class="max-w-7xl mx-auto">
+                <div>
+                    <x-slot:header>
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">Dashboard Auditor</h1>
+                            <p class="text-gray-600 mt-2">Selamat datang, {{ Auth::user()->name }}!</p>
+                        </div>
+                    </x-slot:header>
                     <!-- Header -->
-                    <div class="mb-8">
-                        <h1 class="text-3xl font-bold text-gray-900">Dashboard Auditor</h1>
-                        <p class="text-gray-600 mt-2">Selamat datang, {{ Auth::user()->name }}!</p>
-                    </div>
 
                     <!-- Quick Stats -->
                     @php
@@ -19,7 +21,7 @@
                             ->whereDate('tanggal', today())->count();
                     @endphp
 
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 mt-6">
                         <div class="bg-white p-6 rounded-lg shadow-sm border">
                             <div class="flex items-center justify-between">
                                 <div>
