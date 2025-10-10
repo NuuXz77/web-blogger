@@ -1,7 +1,3 @@
-<div>
-    <!-- Breathing in, I calm body and mind. Breathing out, I smile. - Thich Nhat Hanh -->
-</div>
-
 <!-- filepath: d:\PKL\web-blogger\resources\views\components\user\navbar.blade.php -->
 <!-- Navbar -->
 <nav class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-30 top-0">

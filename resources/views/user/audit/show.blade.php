@@ -296,6 +296,13 @@
                                             </svg>
                                             Ajukan Jadwal Baru
                                         </button>
+                                        <button onclick="openConfirmModal()" 
+                                                class="mt-4 w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            Konfirmasi Jadwal
+                                        </button>
                                     </div>
                                 @elseif($audit->status === 'pending')
                                     <div class="space-y-3">
@@ -405,8 +412,8 @@
                                     <div class="mt-2 text-sm text-blue-700">
                                         <ul class="list-disc list-inside space-y-1">
                                             <li>Pastikan Anda berada di lokasi saat audit berlangsung</li>
-                                            <li>Siapkan dokumen yang diperlukan</li>
-                                            <li>Hubungi admin jika ada kendala</li>
+                                            {{-- <li>Siapkan dokumen yang diperlukan</li>
+                                            <li>Hubungi admin jika ada kendala</li> --}}
                                         </ul>
                                     </div>
                                 </div>

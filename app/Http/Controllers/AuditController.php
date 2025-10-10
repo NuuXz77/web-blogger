@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Exports\AuditReportExport;
+use App\Exports\AuditDetailExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AuditController extends Controller
 {
@@ -21,7 +23,7 @@ class AuditController extends Controller
         $visits = Visits::with(['auditor', 'author'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-        
+
         return view('admin.audit.index', compact('visits'));
     }
 
@@ -32,7 +34,7 @@ class AuditController extends Controller
     {
         $auditors = User::where('role', 'auditor')->get();
         $authors = User::where('role', 'user')->get();
-        
+
         return view('admin.audit.create', compact('auditors', 'authors'));
     }
 
@@ -78,7 +80,7 @@ class AuditController extends Controller
     {
         $auditors = User::where('role', 'auditor')->get();
         $authors = User::where('role', 'user')->get();
-        
+
         return view('admin.audit.edit', compact('audit', 'auditors', 'authors'));
     }
 
@@ -97,7 +99,12 @@ class AuditController extends Controller
         ]);
 
         $audit->update($request->only([
-            'author_id', 'auditor_id', 'tanggal', 'alamat', 'keterangan', 'status'
+            'author_id',
+            'auditor_id',
+            'tanggal',
+            'alamat',
+            'keterangan',
+            'status'
         ]));
 
         return redirect()->route('admin.audit.index')
@@ -193,8 +200,8 @@ class AuditController extends Controller
             'preferred_time' => null,
             'reschedule_requested_at' => null,
             'rejection_reason' => null,
-            'keterangan' => $audit->keterangan . "\n\nJadwal diperbarui oleh admin pada " . now()->format('d M Y, H:i') . 
-                          ($request->waktu ? " - Waktu: " . $request->waktu : ""),
+            'keterangan' => $audit->keterangan . "\n\nJadwal diperbarui oleh admin pada " . now()->format('d M Y, H:i') .
+                ($request->waktu ? " - Waktu: " . $request->waktu : ""),
         ]);
 
         return redirect()->route('admin.audit.index')
@@ -348,7 +355,7 @@ class AuditController extends Controller
         if ($audit->selfie) {
             Storage::delete($audit->selfie);
         }
-        
+
         $audit->delete();
 
         return redirect()->route('admin.audit.index')
@@ -361,7 +368,7 @@ class AuditController extends Controller
     public function approve(Visits $audit)
     {
         $audit->update(['status' => 'selesai']);
-        
+
         return redirect()->back()
             ->with('success', 'Kunjungan berhasil di-ACC!');
     }
@@ -372,7 +379,7 @@ class AuditController extends Controller
     public function reject(Visits $audit)
     {
         $audit->update(['status' => 'pending']);
-        
+
         return redirect()->back()
             ->with('success', 'Kunjungan dikembalikan ke status pending!');
     }
@@ -388,7 +395,7 @@ class AuditController extends Controller
             ->where('auditor_id', Auth::id())
             ->orderBy('tanggal', 'asc')
             ->paginate(10);
-        
+
         return view('auditor.audit.index', compact('visits'));
     }
 
@@ -449,19 +456,19 @@ class AuditController extends Controller
 
         // Process base64 image data
         $imageData = $request->selfie;
-        
+
         // Remove data:image/jpeg;base64, prefix if exists
         if (strpos($imageData, 'data:image') === 0) {
             $imageData = substr($imageData, strpos($imageData, ',') + 1);
         }
-        
+
         // Decode base64
         $decodedImage = base64_decode($imageData);
-        
+
         // Generate unique filename
         $fileName = 'selfie_' . $audit->id . '_' . time() . '.jpg';
         $filePath = 'selfies/' . $fileName;
-        
+
         // Store the image
         Storage::disk('public')->put($filePath, $decodedImage);
 
@@ -481,17 +488,98 @@ class AuditController extends Controller
     /**
      * Show auditor's visit recap with map
      */
-    public function auditorRecap()
+    public function auditorRecap(Request $request)
     {
-        $visits = Visits::with(['author'])
+        $query = Visits::with(['author'])
             ->where('auditor_id', Auth::id())
-            ->where('status', 'completed')
             ->whereNotNull('lat')
             ->whereNotNull('long')
-            ->orderBy('tanggal', 'asc')
-            ->get();
-        
+            ->orderBy('tanggal', 'asc');
+
+        // Filter berdasarkan status
+        $status = $request->get('status', 'completed'); // Default completed
+        // if ($status != 'all') {
+        //     $query->where('status', $status);
+        // }
+
+        // Filter berdasarkan bulan
+        if ($request->has('month') && $request->month != 'all') {
+            $query->whereMonth('tanggal', $request->month);
+        }
+
+        // Filter berdasarkan tahun
+        if ($request->has('year') && $request->year != 'all') {
+            $query->whereYear('tanggal', $request->year);
+        }
+
+        $visits = $query->get();
+
+        // Jika request AJAX, return JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'visits' => $visits,
+                'stats' => [
+                    'total' => $visits->count(),
+                    'this_month' => $visits->filter(fn($visit) => \Carbon\Carbon::parse($visit->tanggal)->isCurrentMonth())->count(),
+                    'this_week' => $visits->filter(fn($visit) => \Carbon\Carbon::parse($visit->tanggal)->isCurrentWeek())->count(),
+                    'unique_locations' => $visits->unique('author_id')->count(),
+                ]
+            ]);
+        }
+
         return view('auditor.audit.recap', compact('visits'));
+    }
+
+    public function recapAuditAdmin(Request $request)
+    {
+        // Only allow admin to access
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $query = Visits::with(['author', 'auditor'])
+            ->whereNotNull('lat')
+            ->whereNotNull('long')
+            ->orderBy('tanggal', 'asc');
+
+        // Filter berdasarkan auditor
+        if ($request->has('auditor_id') && $request->auditor_id != 'all') {
+            $query->where('auditor_id', $request->auditor_id);
+        }
+
+        // Filter berdasarkan status
+        $status = $request->get('status', 'completed'); // Default completed
+        // if ($status != 'all') {
+        //     $query->where('status', $status);
+        // }
+
+        // Filter berdasarkan bulan
+        if ($request->has('month') && $request->month != 'all') {
+            $query->whereMonth('tanggal', $request->month);
+        }
+
+        // Filter berdasarkan tahun
+        if ($request->has('year') && $request->year != 'all') {
+            $query->whereYear('tanggal', $request->year);
+        }
+
+        $visits = $query->get();
+        $auditors = User::where('role', 'auditor')->get();
+
+        // Jika request AJAX, return JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'visits' => $visits,
+                'stats' => [
+                    'total' => $visits->count(),
+                    'this_month' => $visits->filter(fn($visit) => \Carbon\Carbon::parse($visit->tanggal)->isCurrentMonth())->count(),
+                    'this_week' => $visits->filter(fn($visit) => \Carbon\Carbon::parse($visit->tanggal)->isCurrentWeek())->count(),
+                    'unique_locations' => $visits->unique('author_id')->count(),
+                ]
+            ]);
+        }
+
+        return view('admin.audit.recap', compact('visits', 'auditors'));
     }
 
     /**
@@ -541,7 +629,7 @@ class AuditController extends Controller
                         // Format: "Senin, 6 Okt"
                         $dayNames = [
                             'Sunday' => 'Minggu',
-                            'Monday' => 'Senin', 
+                            'Monday' => 'Senin',
                             'Tuesday' => 'Selasa',
                             'Wednesday' => 'Rabu',
                             'Thursday' => 'Kamis',
@@ -578,11 +666,20 @@ class AuditController extends Controller
                 case 'month':
                     // Last 12 months with Indonesian month names
                     $monthNames = [
-                        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                        1 => 'Januari',
+                        2 => 'Februari',
+                        3 => 'Maret',
+                        4 => 'April',
+                        5 => 'Mei',
+                        6 => 'Juni',
+                        7 => 'Juli',
+                        8 => 'Agustus',
+                        9 => 'September',
+                        10 => 'Oktober',
+                        11 => 'November',
+                        12 => 'Desember'
                     ];
-                    
+
                     for ($i = 11; $i >= 0; $i--) {
                         $date = $now->copy()->subMonths($i);
                         $monthName = $monthNames[$date->month];
@@ -606,7 +703,7 @@ class AuditController extends Controller
 
                     $start = \Carbon\Carbon::parse($startDate);
                     $end = \Carbon\Carbon::parse($endDate);
-                    
+
                     if ($end->lt($start)) {
                         return response()->json([
                             'error' => 'End date must be after start date',
@@ -617,19 +714,19 @@ class AuditController extends Controller
 
                     // Determine the appropriate interval based on date range
                     $daysDiff = $start->diffInDays($end);
-                    
+
                     if ($daysDiff <= 31) {
                         // Show daily data for ranges up to 31 days with day names
                         $dayNames = [
                             'Sunday' => 'Minggu',
-                            'Monday' => 'Senin', 
+                            'Monday' => 'Senin',
                             'Tuesday' => 'Selasa',
                             'Wednesday' => 'Rabu',
                             'Thursday' => 'Kamis',
                             'Friday' => 'Jumat',
                             'Saturday' => 'Sabtu'
                         ];
-                        
+
                         $current = $start->copy();
                         while ($current->lte($end)) {
                             if ($daysDiff <= 7) {
@@ -649,11 +746,20 @@ class AuditController extends Controller
                     } else {
                         // Show monthly data for longer ranges with Indonesian month names
                         $monthNames = [
-                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                            1 => 'Januari',
+                            2 => 'Februari',
+                            3 => 'Maret',
+                            4 => 'April',
+                            5 => 'Mei',
+                            6 => 'Juni',
+                            7 => 'Juli',
+                            8 => 'Agustus',
+                            9 => 'September',
+                            10 => 'Oktober',
+                            11 => 'November',
+                            12 => 'Desember'
                         ];
-                        
+
                         $current = $start->copy()->startOfMonth();
                         while ($current->lte($end)) {
                             $monthName = $monthNames[$current->month];
@@ -690,7 +796,6 @@ class AuditController extends Controller
                     'user' => Auth::user()->name . ' (' . Auth::user()->role . ')'
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Chart data error: ' . $e->getMessage());
             return response()->json([
@@ -710,11 +815,70 @@ class AuditController extends Controller
         $dateFrom = $request->date_from;
         $dateTo = $request->date_to;
         $status = $request->status;
-        
+
         $filename = 'laporan_audit_' . date('Y-m-d_H-i-s') . '.xlsx';
-        
+
         return Excel::download(
-            new AuditReportExport($dateFrom, $dateTo, $status), 
+            new AuditReportExport($dateFrom, $dateTo, $status),
+            $filename
+        );
+    }
+
+    /**
+     * Export audit detail to PDF
+     */
+    public function exportPdf(Visits $audit)
+    {
+        // Ensure user has permission to view this audit
+        if (!Auth::user() || Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Generate filename with audit details
+        $filename = 'Laporan_Audit_Detail_' . 
+                   $audit->id . '_' . 
+                   \Carbon\Carbon::parse($audit->tanggal)->format('Y-m-d') . '_' .
+                   now()->format('Y-m-d_H-i-s') . '.pdf';
+
+        // Generate PDF with custom options
+        $pdf = Pdf::loadView('exports.audit-pdf', compact('audit'))
+                  ->setPaper('a4', 'portrait')
+                  ->setOptions([
+                      'isHtml5ParserEnabled' => true,
+                      'isPhpEnabled' => true,
+                      'defaultFont' => 'DejaVu Sans',
+                      'isFontSubsettingEnabled' => true,
+                      'isRemoteEnabled' => true,
+                      'debugKeepTemp' => false,
+                      'debugCss' => false,
+                      'debugLayout' => false,
+                      'debugLayoutLines' => false,
+                      'debugLayoutBlocks' => false,
+                      'debugLayoutInline' => false,
+                      'debugLayoutPaddingBox' => false,
+                  ]);
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Export audit detail to Excel
+     */
+    public function exportDetailExcel(Visits $audit)
+    {
+        // Ensure user has permission to view this audit
+        if (!Auth::user() || Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Generate filename with audit details
+        $filename = 'Laporan_Audit_Detail_' . 
+                   $audit->id . '_' . 
+                   \Carbon\Carbon::parse($audit->tanggal)->format('Y-m-d') . '_' .
+                   now()->format('Y-m-d_H-i-s') . '.xlsx';
+
+        return Excel::download(
+            new AuditDetailExport($audit),
             $filename
         );
     }

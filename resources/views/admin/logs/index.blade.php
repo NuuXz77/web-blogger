@@ -45,7 +45,7 @@
     </style>
     <div class="min-h-screen bg-gray-50">
         <!-- Main Content -->
-        <div class="max-w-7xl mx-auto">
+        <div>
             <x-slot:header>
                 <!-- Header -->
                 <div class="flex justify-between items-center">

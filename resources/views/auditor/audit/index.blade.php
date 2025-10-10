@@ -25,13 +25,13 @@
 
             <!-- Success Message -->
             @if (session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 mt-6">
                     {{ session('success') }}
                 </div>
             @endif
 
             <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 mt-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8 mt-6">
                 <div class="bg-white p-6 rounded-lg shadow-sm border">
                     <div class="flex items-center justify-between">
                         <div>

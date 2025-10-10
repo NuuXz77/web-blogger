@@ -15,6 +15,44 @@
                             </div>
 
                             <div class="flex items-center space-x-3">
+                                <!-- Dropdown for Export Options -->
+                                <div class="relative inline-block text-left">
+                                    <button type="button" onclick="toggleExportDropdown()" 
+                                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                            </path>
+                                        </svg>
+                                        Cetak Audit
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                    
+                                    <!-- Dropdown Menu -->
+                                    <div id="exportDropdown" class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                                        <div class="py-1" role="menu" aria-orientation="vertical">
+                                            <a href="{{ route('admin.audit.export-pdf', $audit) }}" 
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-900" role="menuitem">
+                                                <svg class="w-4 h-4 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                                </svg>
+                                                Download PDF
+                                                <span class="ml-auto text-xs text-gray-500">*.pdf</span>
+                                            </a>
+                                            <a href="{{ route('admin.audit.export-excel', $audit) }}" 
+                                               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-900" role="menuitem">
+                                                <svg class="w-4 h-4 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                Download Excel
+                                                <span class="ml-auto text-xs text-gray-500">*.xlsx</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 @if ($audit->status === 'confirmed_by_author')
                                     <!-- Button Setujui Jadwal Saat Ini -->
                                     @if (!$audit->reschedule_requested)
@@ -644,18 +682,48 @@
                         @if ($audit->lat && $audit->long)
                             <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
                                 <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
-                                            </path>
-                                        </svg>
-                                        Lokasi Kunjungan
+                                    <h3 class="text-lg font-semibold text-gray-900 flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                                                </path>
+                                            </svg>
+                                            Lokasi Kunjungan
+                                        </div>
+                                        <a href="https://www.google.com/maps?q={{ $audit->lat }},{{ $audit->long }}" 
+                                           target="_blank" 
+                                           class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                                </path>
+                                            </svg>
+                                            Buka di Maps
+                                        </a>
                                     </h3>
                                 </div>
                                 <div class="p-6">
                                     <div id="map" class="w-full h-64 rounded-lg border"></div>
+                                    <div class="mt-4 text-center">
+                                        <p class="text-sm text-gray-600">
+                                            Koordinat: {{ $audit->lat }}, {{ $audit->long }}
+                                        </p>
+                                        <a href="https://www.google.com/maps?q={{ $audit->lat }},{{ $audit->long }}" 
+                                           target="_blank" 
+                                           class="inline-flex items-center gap-1 mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
+                                                </path>
+                                            </svg>
+                                            Lihat di Google Maps
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         @endif
@@ -814,6 +882,22 @@
         document.getElementById('rejectRescheduleModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeRejectRescheduleModal();
+            }
+        });
+
+        // Export dropdown functionality
+        function toggleExportDropdown() {
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('exportDropdown');
+            const button = e.target.closest('[onclick="toggleExportDropdown()"]');
+            
+            if (!button && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
             }
         });
     </script>

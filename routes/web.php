@@ -132,8 +132,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Audit/Visits management
     // Chart data endpoint for visits (for admin dashboard) - MUST be before resource route
     Route::get('/audit/visits-chart-data', [App\Http\Controllers\AuditController::class, 'visitsChartData'])->name('audit.chart-data');
+    Route::get('/audit/recap', [App\Http\Controllers\AuditController::class, 'recapAuditAdmin'])->name('audit.recap');
+    Route::get('/audit/{audit}/export-pdf', [App\Http\Controllers\AuditController::class, 'exportPdf'])->name('audit.export-pdf');
+    Route::get('/audit/{audit}/export-excel', [App\Http\Controllers\AuditController::class, 'exportDetailExcel'])->name('audit.export-excel');
     
     Route::resource('audit', App\Http\Controllers\AuditController::class);
+    //rekapan untuk admin
     Route::post('/audit/{audit}/approve', [App\Http\Controllers\AuditController::class, 'approve'])->name('audit.approve');
     Route::post('/audit/{audit}/reject', [App\Http\Controllers\AuditController::class, 'reject'])->name('audit.reject');
     Route::post('/audit/{audit}/confirm', [App\Http\Controllers\AuditController::class, 'adminConfirm'])->name('audit.confirm');
@@ -144,6 +148,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/audit/{audit}/reject-reschedule', [App\Http\Controllers\AuditController::class, 'rejectReschedule'])->name('audit.reject-reschedule');
     Route::get('/admin/audit/export', [AuditController::class, 'exportExcel'])
     ->name('audit.export');
+
     
     // Debug route to test chart data (remove this later)
     Route::get('/debug-chart', function() {

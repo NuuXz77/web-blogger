@@ -234,6 +234,32 @@
             }, 150);
         }
     });
+
+        // Mobile sidebar toggle
+    document.getElementById('toggleSidebarMobile').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const hamburger = document.getElementById('toggleSidebarMobileHamburger');
+        const close = document.getElementById('toggleSidebarMobileClose');
+        
+        sidebar.classList.toggle('hidden');
+        backdrop.classList.toggle('hidden');
+        hamburger.classList.toggle('hidden');
+        close.classList.toggle('hidden');
+    });
+
+    // Close mobile sidebar when clicking backdrop
+    document.getElementById('sidebarBackdrop').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const hamburger = document.getElementById('toggleSidebarMobileHamburger');
+        const close = document.getElementById('toggleSidebarMobileClose');
+        
+        sidebar.classList.add('hidden');
+        backdrop.classList.add('hidden');
+        hamburger.classList.remove('hidden');
+        close.classList.add('hidden');
+    });
 </script>
 
 <style>

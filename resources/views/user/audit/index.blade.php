@@ -6,10 +6,10 @@
                 <x-slot:header>
                     <!-- Header -->
                     <div>
-                        <div class="flex justify-between items-center">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
-                                <h1 class="text-3xl font-bold text-gray-900">Daftar Audit Saya</h1>
-                                <p class="text-gray-600 mt-2">Semua jadwal audit yang akan dilakukan di tempat Anda</p>
+                                <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">Daftar Audit Saya</h1>
+                                <p class="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">Semua jadwal audit yang akan dilakukan di tempat Anda</p>
                             </div>
                         </div>
                     </div>
@@ -30,15 +30,15 @@
                 @endif
 
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-                    <div class="b g-white p-6 rounded-lg shadow-sm border">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-6 mb-6 md:mb-8">
+                    <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-600">Total Audit</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $visits->total() }}</p>
+                                <p class="text-xs md:text-sm text-gray-600">Total Audit</p>
+                                <p class="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">{{ $visits->total() }}</p>
                             </div>
-                            <div class="bg-blue-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                            <div class="bg-blue-100 p-2 md:p-3 rounded-full">
+                                <svg class="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-blue-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -47,15 +47,15 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-600">Menunggu Konfirmasi Saya</p>
-                                <p class="text-2xl font-bold text-yellow-600">
+                                <p class="text-xs md:text-sm text-gray-600">Menunggu Saya</p>
+                                <p class="text-lg md:text-xl lg:text-2xl font-bold text-yellow-600">
                                     {{ $visits->where('status', 'pending')->count() }}</p>
                             </div>
-                            <div class="bg-yellow-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor"
+                            <div class="bg-yellow-100 p-2 md:p-3 rounded-full">
+                                <svg class="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-yellow-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -64,15 +64,15 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-600">Menunggu Admin</p>
-                                <p class="text-2xl font-bold text-blue-600">
+                                <p class="text-xs md:text-sm text-gray-600">Menunggu Admin</p>
+                                <p class="text-lg md:text-xl lg:text-2xl font-bold text-blue-600">
                                     {{ $visits->where('status', 'confirmed_by_author')->count() }}</p>
                             </div>
-                            <div class="bg-blue-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                            <div class="bg-blue-100 p-2 md:p-3 rounded-full">
+                                <svg class="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-blue-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -81,15 +81,15 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-600">Dalam Proses</p>
-                                <p class="text-2xl font-bold text-orange-600">
+                                <p class="text-xs md:text-sm text-gray-600">Dalam Proses</p>
+                                <p class="text-lg md:text-xl lg:text-2xl font-bold text-orange-600">
                                     {{ $visits->whereIn('status', ['confirmed_by_admin', 'in_progress'])->count() }}</p>
                             </div>
-                            <div class="bg-orange-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor"
+                            <div class="bg-orange-100 p-2 md:p-3 rounded-full">
+                                <svg class="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-orange-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -98,15 +98,15 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-600">Selesai</p>
-                                <p class="text-2xl font-bold text-green-600">
+                                <p class="text-xs md:text-sm text-gray-600">Selesai</p>
+                                <p class="text-lg md:text-xl lg:text-2xl font-bold text-green-600">
                                     {{ $visits->where('status', 'completed')->count() }}</p>
                             </div>
-                            <div class="bg-green-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                            <div class="bg-green-100 p-2 md:p-3 rounded-full">
+                                <svg class="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-green-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7"></path>
@@ -116,10 +116,11 @@
                     </div>
                 </div>
 
-                <!-- Filter Tabs -->
+                <!-- Filter Tabs - Responsive -->
                 <div class="bg-white rounded-lg shadow-sm border mb-6">
-                    <div class="border-b border-gray-200">
-                        <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+                    <!-- Desktop Tabs -->
+                    <div class="hidden md:block border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-4 lg:space-x-8 px-4 lg:px-6" aria-label="Tabs">
                             <button onclick="filterVisits('all')"
                                 class="filter-tab active border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                                 Semua
@@ -128,15 +129,27 @@
                                 class="filter-tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                                 Menunggu Konfirmasi Saya
                             </button>
-                            <button onclick="filterVisits('konfirmasi')"
+                            <button onclick="filterVisits('in_progress')"
                                 class="filter-tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                                 Dalam Proses
                             </button>
-                            <button onclick="filterVisits('selesai')"
+                            <button onclick="filterVisits('completed')"
                                 class="filter-tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                                 Selesai
                             </button>
                         </nav>
+                    </div>
+                    
+                    <!-- Mobile Filter Dropdown -->
+                    <div class="md:hidden p-4">
+                        <label for="mobile-filter" class="sr-only">Filter Status</label>
+                        <select id="mobile-filter" onchange="filterVisitsMobile(this.value)" 
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+                            <option value="all">Semua Audit</option>
+                            <option value="pending">Menunggu Konfirmasi Saya</option>
+                            <option value="in_progress">Dalam Proses</option>
+                            <option value="completed">Selesai</option>
+                        </select>
                     </div>
                 </div>
 
@@ -146,140 +159,129 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Auditor</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Tanggal Audit</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Alamat</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Status</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200" id="visits-table">
                                 @forelse($visits as $visit)
                                     <tr class="hover:bg-gray-50 visit-row" data-status="{{ $visit->status }}">
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
-                                                    <div
-                                                        class="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center">
+                                                <div class="flex-shrink-0 h-8 w-8 md:h-10 md:w-10">
+                                                    <div class="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary text-white flex items-center justify-center text-xs md:text-sm">
                                                         {{ substr($visit->auditor->name, 0, 1) }}
                                                     </div>
                                                 </div>
-                                                <div class="ml-4">
+                                                <div class="ml-3 md:ml-4">
                                                     <div class="text-sm font-medium text-gray-900">
                                                         {{ $visit->auditor->name }}</div>
-                                                    <div class="text-sm text-gray-500">{{ $visit->auditor->email }}
+                                                    <div class="text-xs md:text-sm text-gray-500 hidden md:block">{{ $visit->auditor->email }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex flex-col space-y-2">
+                                        <td class="px-4 md:px-6 py-4">
+                                            <div class="flex flex-col space-y-1 md:space-y-2">
                                                 <div class="text-sm text-gray-900">
                                                     {{ \Carbon\Carbon::parse($visit->tanggal)->format('d M Y') }}
                                                 </div>
                                                 <div>
                                                     @if (\Carbon\Carbon::parse($visit->tanggal)->isToday())
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                             Hari ini
                                                         </span>
                                                     @elseif(\Carbon\Carbon::parse($visit->tanggal)->isTomorrow())
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                                                             Besok
                                                         </span>
                                                     @elseif(\Carbon\Carbon::parse($visit->tanggal)->isPast())
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                             Lewat
                                                         </span>
                                                     @else
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                             Akan datang
                                                         </span>
                                                     @endif
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-900">{{ Str::limit($visit->alamat, 50) }}
+                                        <td class="px-4 md:px-6 py-4">
+                                            <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ $visit->alamat }}">
+                                                {{ Str::limit($visit->alamat, 40) }}
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
                                             @if ($visit->status === 'pending')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
                                                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                     </svg>
-                                                    Perlu Dikonfirmasi
+                                                    <span class="hidden sm:inline">Perlu Dikonfirmasi</span>
+                                                    <span class="sm:hidden">Konfirmasi</span>
                                                 </span>
                                             @elseif($visit->status === 'confirmed_by_admin')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
                                                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                                         </path>
                                                     </svg>
-                                                    Menunggu Konfirmasi (Admin)
+                                                    <span class="hidden sm:inline">Menunggu Admin</span>
+                                                    <span class="sm:hidden">Admin</span>
                                                 </span>
                                             @elseif($visit->status === 'confirmed_by_author')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
                                                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                                         </path>
                                                     </svg>
-                                                    DiKonfirmasi
+                                                    Dikonfirmasi
                                                 </span>
                                             @elseif($visit->status === 'in_progress')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
                                                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                                         </path>
                                                     </svg>
-                                                    Dalam Proses
+                                                    <span class="hidden sm:inline">Dalam Proses</span>
+                                                    <span class="sm:hidden">Proses</span>
                                                 </span>
                                             @elseif($visit->status === 'completed')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2" d="M5 13l4 4L19 7"></path>
                                                     </svg>
-                                                    Kunjungan Selesai
+                                                    Selesai
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('user.audit.show', $visit) }}"
-                                                class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                class="inline-flex items-center px-2 md:px-3 py-1 md:py-2 border border-gray-300 shadow-sm text-xs md:text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -294,19 +296,17 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-6 py-12 text-center">
+                                        <td colspan="5" class="px-4 md:px-6 py-8 md:py-12 text-center">
                                             <div class="flex flex-col items-center">
-                                                <svg class="w-12 h-12 text-gray-400 mb-4" fill="none"
+                                                <svg class="w-8 h-8 md:w-12 md:h-12 text-gray-400 mb-3 md:mb-4" fill="none"
                                                     stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
                                                         d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
                                                     </path>
                                                 </svg>
-                                                <h3 class="text-lg font-medium text-gray-900 mb-2">Belum ada jadwal
-                                                    audit</h3>
-                                                <p class="text-gray-500">Saat ini belum ada jadwal audit yang
-                                                    ditugaskan untuk Anda.</p>
+                                                <h3 class="text-base md:text-lg font-medium text-gray-900 mb-1 md:mb-2">Belum ada jadwal audit</h3>
+                                                <p class="text-gray-500 text-sm md:text-base">Saat ini belum ada jadwal audit yang ditugaskan untuk Anda.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -317,7 +317,7 @@
 
                     <!-- Pagination -->
                     @if ($visits->hasPages())
-                        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                        <div class="bg-white px-4 md:px-6 py-3 border-t border-gray-200">
                             {{ $visits->links() }}
                         </div>
                     @endif
@@ -344,12 +344,33 @@
 
             // Filter rows
             rows.forEach(row => {
-                if (status === 'all' || row.dataset.status === status) {
+                if (status === 'all') {
                     row.style.display = '';
                 } else {
-                    row.style.display = 'none';
+                    row.style.display = row.dataset.status === status ? '' : 'none';
+                }
+            });
+        }
+
+        // Mobile filter function
+        function filterVisitsMobile(status) {
+            const rows = document.querySelectorAll('.visit-row');
+            
+            // Filter rows
+            rows.forEach(row => {
+                if (status === 'all') {
+                    row.style.display = '';
+                } else {
+                    row.style.display = row.dataset.status === status ? '' : 'none';
                 }
             });
         }
     </script>
+
+    <style>
+        .filter-tab.active {
+            border-color: #3B82F6 !important;
+            color: #3B82F6 !important;
+        }
+    </style>
 </x-layouts.app>

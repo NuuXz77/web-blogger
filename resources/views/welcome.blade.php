@@ -1062,7 +1062,7 @@
             <div class="pt-8 mt-8 border-t border-gray-700/50">
                 <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                     <div class="text-gray-400 text-sm">
-                        © 2024 Web Blogger. All rights reserved.
+                        © 2025 Web Blogger. All rights reserved.
                     </div>
                     <div class="flex space-x-6 text-sm">
                         <a href="#" class="text-gray-400 hover:text-white transition duration-300">
