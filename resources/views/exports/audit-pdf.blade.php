@@ -3,548 +3,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Detail Audit - {{ $audit->id }}</title>
+    <title>Laporan Audit - #{{ $audit->id }}</title>
     <style>
         @page {
-            margin: 2cm 1.5cm;
-            size: A4;
+            margin: 2cm; /* Margin halaman A4 */
+            size: A4 portrait;
         }
-        
+
+        /* Reset & Font Dasar */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important; /* Memaksa browser mencetak warna background */
+            print-color-adjust: exact !important;
         }
-        
+
         body {
-            font-family: 'DejaVu Sans', Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.4;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.5;
             color: #333;
-            background-color: #fff;
         }
-        
+
+        /* --- STRUKTUR UTAMA --- */
         .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
+            padding: 1cm; /* Padding internal untuk konten agar tidak terpotong */
+            border: 1px solid #e0e0e0;
         }
-        
-        /* HEADER STYLES */
+
+        /* --- HEADER --- */
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            border-bottom: 3px solid #1F2937;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #2563eb; /* Biru Primer */
+            margin-bottom: 25px;
         }
-        
-        .company-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1F2937;
-            margin-bottom: 8px;
+        .header h1 {
+            font-size: 20px;
+            color: #2563eb;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 5px;
         }
-        
-        .company-subtitle {
+        .header .document-title {
+            margin-top: 10px;
             font-size: 14px;
-            color: #6B7280;
-            margin-bottom: 8px;
-        }
-        
-        .company-contact {
-            font-size: 10px;
-            color: #9CA3AF;
-            margin-bottom: 15px;
-        }
-        
-        .document-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #3B82F6;
-            margin-top: 20px;
-            padding: 12px 20px;
-            background: linear-gradient(90deg, #3B82F6, #1D4ED8);
-            color: white;
-            border-radius: 8px;
-        }
-        
-        /* SECTION STYLES */
-        .section {
-            margin-bottom: 25px;
-            page-break-inside: avoid;
-        }
-        
-        .section-header {
-            background: #F3F4F6;
-            color: #374151;
-            padding: 12px 15px;
-            font-weight: bold;
-            font-size: 14px;
-            border-left: 4px solid #3B82F6;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        
-        .section-content {
-            padding: 0 10px;
-        }
-        
-        /* INFO GRID */
-        .info-grid {
-            display: table;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        
-        .info-row {
-            display: table-row;
-            margin-bottom: 8px;
-        }
-        
-        .info-label {
-            display: table-cell;
-            width: 35%;
-            font-weight: bold;
-            color: #4B5563;
-            padding: 8px 10px 8px 0;
-            vertical-align: top;
-            border-bottom: 1px solid #E5E7EB;
-        }
-        
-        .info-value {
-            display: table-cell;
-            width: 65%;
-            padding: 8px 0;
-            vertical-align: top;
-            border-bottom: 1px solid #E5E7EB;
-            word-wrap: break-word;
-        }
-        
-        /* STATUS BADGES */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
+            color: #555;
         }
-        
-        .status-pending {
-            background: #FEF3C7;
-            color: #92400E;
+
+        /* --- BAGIAN KONTEN --- */
+        .section {
+            margin-bottom: 20px;
+            page-break-inside: avoid; /* Mencegah section terpotong antar halaman */
         }
-        
-        .status-confirmed-author {
-            background: #DBEAFE;
-            color: #1E40AF;
-        }
-        
-        .status-confirmed-admin {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-        
-        .status-completed {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-        
-        /* SPECIAL CONTENT */
-        .address-box {
-            background: #F9FAFB;
-            border: 1px solid #E5E7EB;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 5px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        
-        .alert-box {
-            background: #FEF2F2;
-            border: 1px solid #FECACA;
-            color: #B91C1C;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 5px;
-        }
-        
-        .success-box {
-            background: #ECFDF5;
-            border: 1px solid #A7F3D0;
-            color: #065F46;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 5px;
-        }
-        
-        .warning-box {
-            background: #FFFBEB;
-            border: 1px solid #FDE68A;
-            color: #92400E;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 5px;
-        }
-        
-        /* COORDINATES & LINKS */
-        .coordinates {
-            font-family: 'Courier New', monospace;
-            background: #F3F4F6;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #D1D5DB;
-        }
-        
-        .maps-link {
-            color: #3B82F6;
-            text-decoration: none;
-            font-size: 11px;
-            word-break: break-all;
-        }
-        
-        /* FOOTER */
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 2px solid #E5E7EB;
-            text-align: center;
-            font-size: 10px;
-            color: #6B7280;
-            page-break-inside: avoid;
-        }
-        
-        .footer-info {
-            margin-bottom: 8px;
-        }
-        
-        .footer-copyright {
-            font-style: italic;
-        }
-        
-        /* ICONS (using Unicode symbols) */
-        .icon {
+        .section-title {
+            font-size: 13px;
             font-weight: bold;
-            margin-right: 8px;
+            color: #ffffff;
+            background-color: #2563eb; /* Biru Primer */
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
         }
-        
-        /* PAGE BREAK CONTROLS */
-        .page-break {
-            page-break-before: always;
-        }
-        
-        .no-break {
-            page-break-inside: avoid;
-        }
-        
-        /* TABLE STYLES */
-        .data-table {
+
+        /* --- TABEL --- */
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
         }
-        
-        .data-table th,
-        .data-table td {
-            border: 1px solid #D1D5DB;
-            padding: 10px;
+        table th, table td {
+            border: 1px solid #e0e0e0;
+            padding: 8px 10px;
             text-align: left;
             vertical-align: top;
         }
-        
-        .data-table th {
-            background: #F9FAFB;
+        table th {
+            background-color: #f4f6f8;
             font-weight: bold;
-            color: #374151;
         }
+        .info-table td:first-child {
+            width: 25%;
+            font-weight: bold;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        /* --- ELEMEN KUSTOM --- */
+        .box {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            background-color: #f9fafb;
+            white-space: pre-wrap; /* Agar line break di textarea tetap tampil */
+            word-wrap: break-word;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: bold;
+            font-size: 10px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        .status-completed { background-color: #16a34a; } /* Hijau */
+        .status-inprogress { background-color: #f97316; } /* Oranye */
+        .status-confirmed { background-color: #2563eb; } /* Biru */
+        .status-pending { background-color: #6b7280; } /* Abu-abu */
+        .status-reschedule { background-color: #f59e0b; } /* Kuning */
         
-        /* RESPONSIVE FIXES FOR PDF */
-        @media print {
-            .section {
-                page-break-inside: avoid;
-            }
-            
-            .section-header {
-                page-break-after: avoid;
-            }
+        /* --- GAMBAR --- */
+        .image-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .image-section img {
+            max-width: 90%;
+            height: auto;
+            border: 2px solid #e0e0e0;
+            padding: 5px;
+            background-color: #fff;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ccc;
+            text-align: center;
+            font-size: 9px;
+            color: #777;
         }
     </style>
 </head>
 <body>
+
+    @php
+        // Logika untuk menentukan teks dan kelas status
+        $status = ['text' => 'TIDAK DIKETAHUI', 'class' => 'status-pending'];
+        switch ($audit->status) {
+            case 'pending':
+                $status = ['text' => 'PENDING', 'class' => 'status-pending'];
+                break;
+            case 'confirmed_by_author':
+                $status = ['text' => 'DISETUJUI AUTHOR', 'class' => 'status-confirmed'];
+                break;
+            case 'confirmed_by_admin':
+                $status = ['text' => 'DISETUJUI ADMIN', 'class' => 'status-confirmed'];
+                break;
+            case 'in_progress':
+                $status = ['text' => 'BERLANGSUNG', 'class' => 'status-inprogress'];
+                break;
+            case 'completed':
+            case 'selesai':
+                $status = ['text' => 'SELESAI', 'class' => 'status-completed'];
+                break;
+        }
+        if ($audit->reschedule_requested) {
+            $status = ['text' => 'PERMINTAAN RESCHEDULE', 'class' => 'status-reschedule'];
+        }
+    @endphp
+
     <div class="container">
-        <!-- HEADER SECTION -->
+        <!-- HEADER -->
         <div class="header">
-            <div class="company-name">
-                🏢 Web Blogger Audit System
-            </div>
-            <div class="company-subtitle">
-                Sistem Manajemen Audit Kunjungan Terpadu
-            </div>
-            <div class="company-contact">
-                📍 Jl. Contoh Alamat No. 123, Kota, Provinsi 12345<br>
-                📞 (021) 1234-5678 | 📧 admin@webblogger.com | 🌐 www.webblogger.com
-            </div>
-            <div class="document-title">
-                📋 LAPORAN DETAIL KUNJUNGAN AUDIT
-            </div>
+            <h1>Web Blogger Audit System</h1>
+            <div class="document-title">Laporan Detail Kunjungan Audit</div>
         </div>
 
-        <!-- BASIC INFORMATION SECTION -->
+        <!-- INFORMASI DASAR -->
         <div class="section">
-            <div class="section-header">
-                <span class="icon">📝</span>INFORMASI DASAR KUNJUNGAN
-            </div>
-            <div class="section-content">
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">ID Audit:</div>
-                        <div class="info-value"><strong>#{{ $audit->id }}</strong></div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Status Kunjungan:</div>
-                        <div class="info-value">
-                            @if($audit->status === 'pending')
-                                <span class="status-badge status-pending">⏳ Pending</span>
-                            @elseif($audit->status === 'confirmed_by_author')
-                                <span class="status-badge status-confirmed-author">✅ Dikonfirmasi (Author)</span>
-                            @elseif($audit->status === 'confirmed_by_admin')
-                                <span class="status-badge status-confirmed-admin">✅ Dikonfirmasi (Admin)</span>
-                            @else
-                                <span class="status-badge status-completed">🎉 Selesai</span>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Tanggal Kunjungan:</div>
-                        <div class="info-value">📅 {{ \Carbon\Carbon::parse($audit->tanggal)->format('l, d F Y') }}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Waktu Kunjungan:</div>
-                        <div class="info-value">🕐 {{ $audit->waktu ?? 'Belum ditentukan' }}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Tanggal Dibuat:</div>
-                        <div class="info-value">📅 {{ $audit->created_at->format('d F Y, H:i') }} WIB</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Terakhir Diupdate:</div>
-                        <div class="info-value">🔄 {{ $audit->updated_at->format('d F Y, H:i') }} WIB</div>
-                    </div>
-                </div>
-            </div>
+            <div class="section-title">I. Informasi Dasar Kunjungan</div>
+            <table class="info-table">
+                <tr>
+                    <td>ID Audit</td>
+                    <td><strong>#{{ $audit->id }}</strong></td>
+                </tr>
+                <tr>
+                    <td>Status Kunjungan</td>
+                    <td><span class="status-badge {{ $status['class'] }}">{{ $status['text'] }}</span></td>
+                </tr>
+                <tr>
+                    <td>Tanggal Kunjungan</td>
+                    <td>{{ \Carbon\Carbon::parse($audit->tanggal)->translatedFormat('d F Y') }}</td>
+                </tr>
+                <tr>
+                    <td>Waktu Kunjungan</td>
+                    <td>{{ $audit->waktu ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <td>Tanggal Dibuat</td>
+                    <td>{{ $audit->created_at->translatedFormat('d F Y, H:i') }} WIB</td>
+                </tr>
+            </table>
         </div>
 
-        <!-- PERSONNEL INFORMATION SECTION -->
+        <!-- INFORMASI PERSONEL -->
         <div class="section">
-            <div class="section-header">
-                <span class="icon">👥</span>INFORMASI PERSONEL
-            </div>
-            <div class="section-content">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Role</th>
-                            <th>Nama Lengkap</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>👤 Author</strong></td>
-                            <td>{{ $audit->author->name }}</td>
-                            <td>{{ $audit->author->email }}</td>
-                            <td>{{ ucfirst($audit->author->role) }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>🛡️ Auditor</strong></td>
-                            <td>{{ $audit->auditor->name }}</td>
-                            <td>{{ $audit->auditor->email }}</td>
-                            <td>{{ ucfirst($audit->auditor->role) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="section-title">II. Informasi Personel</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="25%">Role</th>
+                        <th width="35%">Nama Lengkap</th>
+                        <th width="40%">Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Author</strong></td>
+                        <td>{{ $audit->author->name }}</td>
+                        <td>{{ $audit->author->email }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Auditor</strong></td>
+                        <td>{{ $audit->auditor->name }}</td>
+                        <td>{{ $audit->auditor->email }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <!-- LOCATION INFORMATION SECTION -->
+        <!-- INFORMASI LOKASI -->
         <div class="section">
-            <div class="section-header">
-                <span class="icon">📍</span>INFORMASI LOKASI KUNJUNGAN
-            </div>
-            <div class="section-content">
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">Alamat Tujuan:</div>
-                        <div class="info-value">
-                            <div class="address-box">{{ $audit->alamat }}</div>
-                        </div>
-                    </div>
-                    @if($audit->lat && $audit->long)
-                    <div class="info-row">
-                        <div class="info-label">Koordinat GPS:</div>
-                        <div class="info-value">
-                            <div class="coordinates">
-                                📍 Latitude: {{ $audit->lat }}<br>
-                                📍 Longitude: {{ $audit->long }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Link Google Maps:</div>
-                        <div class="info-value">
-                            <a href="https://maps.google.com/?q={{ $audit->lat }},{{ $audit->long }}" class="maps-link">
-                                🗺️ https://maps.google.com/?q={{ $audit->lat }},{{ $audit->long }}
-                            </a>
-                        </div>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- ADDITIONAL INFORMATION SECTION -->
-        @if($audit->keterangan || $audit->reschedule_requested)
-        <div class="section">
-            <div class="section-header">
-                <span class="icon">📄</span>INFORMASI TAMBAHAN
-            </div>
-            <div class="section-content">
-                @if($audit->keterangan)
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">Keterangan Audit:</div>
-                        <div class="info-value">
-                            <div class="address-box">{{ $audit->keterangan }}</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="section-title">III. Informasi Lokasi</div>
+            <table class="info-table">
+                <tr>
+                    <td>Alamat Tujuan</td>
+                    <td><div class="box">{{ $audit->alamat }}</div></td>
+                </tr>
+                @if($audit->lat && $audit->long)
+                <tr>
+                    <td>Koordinat GPS</td>
+                    <td>Lat: {{ $audit->lat }}, Long: {{ $audit->long }}</td>
+                </tr>
                 @endif
-
-                @if($audit->reschedule_requested)
-                <div class="warning-box">
-                    <strong>⚠️ PERMINTAAN PERUBAHAN JADWAL</strong><br>
-                    <div style="margin-top: 10px;">
-                        @if($audit->preferred_date)
-                        📅 <strong>Tanggal yang Diinginkan:</strong> {{ \Carbon\Carbon::parse($audit->preferred_date)->format('d F Y') }}<br>
-                        @endif
-                        @if($audit->preferred_time)
-                        🕐 <strong>Waktu yang Diinginkan:</strong> {{ $audit->preferred_time }}<br>
-                        @endif
-                        @if($audit->reschedule_reason)
-                        💬 <strong>Alasan Reschedule:</strong><br>
-                        <div style="margin-top: 5px; padding: 8px; background: rgba(255,255,255,0.7); border-radius: 4px;">
-                            {{ $audit->reschedule_reason }}
-                        </div>
-                        @endif
-                        @if($audit->reschedule_requested_at)
-                        📝 <strong>Diminta pada:</strong> {{ \Carbon\Carbon::parse($audit->reschedule_requested_at)->format('d F Y, H:i') }} WIB
-                        @endif
-                    </div>
-                </div>
-                @endif
-            </div>
-        </div>
-        @endif
-
-        <!-- CONFIRMATION STATUS SECTION -->
-        <div class="section">
-            <div class="section-header">
-                <span class="icon">✅</span>STATUS KONFIRMASI
-            </div>
-            <div class="section-content">
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">Konfirmasi Author:</div>
-                        <div class="info-value">
-                            @if($audit->author_confirmed)
-                                <span class="success-box">✅ Sudah Dikonfirmasi pada {{ $audit->author_confirmed_at->format('d F Y, H:i') }} WIB</span>
-                            @else
-                                <span class="alert-box">❌ Belum Dikonfirmasi</span>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Konfirmasi Admin:</div>
-                        <div class="info-value">
-                            @if($audit->status === 'confirmed_by_admin' || $audit->status === 'selesai')
-                                <span class="success-box">✅ Sudah Dikonfirmasi oleh Admin</span>
-                            @else
-                                <span class="warning-box">⏳ Belum Dikonfirmasi oleh Admin</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                @if($audit->rejection_reason)
-                <div class="alert-box">
-                    <strong>❌ ALASAN PENOLAKAN:</strong><br>
-                    <div style="margin-top: 8px;">{{ $audit->rejection_reason }}</div>
-                </div>
-                @endif
-            </div>
+            </table>
         </div>
 
-        <!-- AUDIT REPORT SECTION -->
+        <!-- HASIL KUNJUNGAN -->
         @if($audit->hasil || $audit->selfie)
         <div class="section">
-            <div class="section-header">
-                <span class="icon">📊</span>LAPORAN HASIL KUNJUNGAN
-            </div>
-            <div class="section-content">
-                @if($audit->hasil)
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">Hasil Kunjungan:</div>
-                        <div class="info-value">
-                            <div class="success-box">{{ $audit->hasil }}</div>
-                        </div>
-                    </div>
-                </div>
-                @endif
+            <div class="section-title">IV. Laporan Hasil Kunjungan</div>
+            @if($audit->hasil)
+            <table class="info-table">
+                <tr>
+                    <td>Hasil Kunjungan</td>
+                    <td><div class="box">{{ $audit->hasil }}</div></td>
+                </tr>
+                <tr>
+                    <td>Waktu Lapor</td>
+                    <td>{{ $audit->updated_at->translatedFormat('d F Y, H:i') }} WIB</td>
+                </tr>
+            </table>
+            @endif
 
-                @if($audit->selfie)
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">Foto Bukti:</div>
-                        <div class="info-value">
-                            📷 File foto tersimpan: <strong>{{ $audit->selfie }}</strong><br>
-                            <small style="color: #6B7280;">*Foto dapat diakses melalui sistem untuk verifikasi</small>
-                        </div>
-                    </div>
+            @if($audit->selfie)
+                @php
+                    $imageData = null;
+                    $imagePath = public_path('storage/' . $audit->selfie);
+                    if (file_exists($imagePath)) {
+                        $imageData = 'data:' . mime_content_type($imagePath) . ';base64,' . base64_encode(file_get_contents($imagePath));
+                    }
+                @endphp
+                <div class="image-section">
+                    <strong>Dokumentasi Kunjungan:</strong><br><br>
+                    @if($imageData)
+                        <img src="{{ $imageData }}" alt="Foto Bukti Kunjungan">
+                    @else
+                        <div class="box" style="text-align: center;">Foto tidak dapat dimuat.</div>
+                    @endif
                 </div>
-                @endif
-
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-label">Status Laporan:</div>
-                        <div class="info-value">
-                            @if($audit->hasil)
-                                <span class="success-box">✅ Laporan Sudah Disubmit pada {{ $audit->updated_at->format('d F Y, H:i') }} WIB</span>
-                            @else
-                                <span class="warning-box">⏳ Laporan Belum Disubmit</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endif
         </div>
         @endif
 
-        <!-- FOOTER SECTION -->
+        <!-- FOOTER -->
         <div class="footer">
-            <div class="footer-info">
-                📅 Laporan ini digenerate secara otomatis pada <strong>{{ now()->format('l, d F Y') }}</strong> pukul <strong>{{ now()->format('H:i:s') }} WIB</strong>
-            </div>
-            <div class="footer-info">
-                🖥️ Web Blogger Audit System v1.0 | System ID: WB-{{ $audit->id }}-{{ now()->format('Ymd') }}
-            </div>
-            <div class="footer-copyright">
-                © {{ date('Y') }} Web Blogger Audit System. All Rights Reserved. | Generated by Admin: {{ Auth::user()->name }}
-            </div>
+            <p>Dokumen ini dibuat secara otomatis oleh Web Blogger Audit System pada {{ now()->translatedFormat('d F Y, H:i:s') }} WIB.</p>
+            <p>&copy; {{ date('Y') }} Web Blogger | Dibuat oleh: {{ Auth::user()->name }}</p>
         </div>
     </div>
 </body>
