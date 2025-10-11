@@ -104,7 +104,7 @@
                         <p>Gunakan kredensial berikut untuk login sebagai admin:</p>
                         <ul class="mt-1 list-disc list-inside">
                             <li>Email: <span class="font-mono">admin@a.com</span></li>
-                            <li>Password: <span class="font-mono">adminadmin</span></li>
+                            <li>Password: <span class="font-mono">123123</span></li>
                         </ul>
                     </div>
                 </div>
