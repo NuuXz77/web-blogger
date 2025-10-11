@@ -112,6 +112,8 @@ class AuditController extends Controller
         ]);
 
         $audit->update([
+            'author_confirmed' => true,
+            'author_confirmed_at' => now(),
             'reschedule_requested' => true,
             'reschedule_reason' => $request->reschedule_reason,
             'preferred_date' => $request->preferred_date,

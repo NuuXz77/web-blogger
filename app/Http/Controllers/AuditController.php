@@ -193,7 +193,9 @@ class AuditController extends Controller
 
         $audit->update([
             'tanggal' => $request->tanggal,
-            'status' => 'pending', // Reset status to pending so user can confirm again
+            'status' => 'confirmed_by_admin',
+            'admin_confirmed' => true,
+            'admin_confirmed_at' => now(),
             'reschedule_requested' => false,
             'reschedule_reason' => null,
             'preferred_date' => null,
@@ -548,10 +550,12 @@ class AuditController extends Controller
         }
 
         // Filter berdasarkan status
-        $status = $request->get('status', 'completed'); // Default completed
-        // if ($status != 'all') {
-        //     $query->where('status', $status);
-        // }
+        if ($request->has('status') && $request->status != 'all') {
+            $query->where('status', $request->status);
+        } else {
+            // Default filter untuk status completed
+            $query->where('status', 'completed');
+        }
 
         // Filter berdasarkan bulan
         if ($request->has('month') && $request->month != 'all') {
@@ -835,28 +839,28 @@ class AuditController extends Controller
         }
 
         // Generate filename with audit details
-        $filename = 'Laporan_Audit_Detail_' . 
-                   $audit->id . '_' . 
-                   \Carbon\Carbon::parse($audit->tanggal)->format('Y-m-d') . '_' .
-                   now()->format('Y-m-d_H-i-s') . '.pdf';
+        $filename = 'Laporan_Audit_Detail_' .
+            $audit->id . '_' .
+            \Carbon\Carbon::parse($audit->tanggal)->format('Y-m-d') . '_' .
+            now()->format('Y-m-d_H-i-s') . '.pdf';
 
         // Generate PDF with custom options
         $pdf = Pdf::loadView('exports.audit-pdf', compact('audit'))
-                  ->setPaper('a4', 'portrait')
-                  ->setOptions([
-                      'isHtml5ParserEnabled' => true,
-                      'isPhpEnabled' => true,
-                      'defaultFont' => 'DejaVu Sans',
-                      'isFontSubsettingEnabled' => true,
-                      'isRemoteEnabled' => true,
-                      'debugKeepTemp' => false,
-                      'debugCss' => false,
-                      'debugLayout' => false,
-                      'debugLayoutLines' => false,
-                      'debugLayoutBlocks' => false,
-                      'debugLayoutInline' => false,
-                      'debugLayoutPaddingBox' => false,
-                  ]);
+            ->setPaper('a4', 'portrait')
+            ->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isPhpEnabled' => true,
+                'defaultFont' => 'DejaVu Sans',
+                'isFontSubsettingEnabled' => true,
+                'isRemoteEnabled' => true,
+                'debugKeepTemp' => false,
+                'debugCss' => false,
+                'debugLayout' => false,
+                'debugLayoutLines' => false,
+                'debugLayoutBlocks' => false,
+                'debugLayoutInline' => false,
+                'debugLayoutPaddingBox' => false,
+            ]);
 
         return $pdf->download($filename);
     }
@@ -872,10 +876,10 @@ class AuditController extends Controller
         }
 
         // Generate filename with audit details
-        $filename = 'Laporan_Audit_Detail_' . 
-                   $audit->id . '_' . 
-                   \Carbon\Carbon::parse($audit->tanggal)->format('Y-m-d') . '_' .
-                   now()->format('Y-m-d_H-i-s') . '.xlsx';
+        $filename = 'Laporan_Audit_Detail_' .
+            $audit->id . '_' .
+            \Carbon\Carbon::parse($audit->tanggal)->format('Y-m-d') . '_' .
+            now()->format('Y-m-d_H-i-s') . '.xlsx';
 
         return Excel::download(
             new AuditDetailExport($audit),

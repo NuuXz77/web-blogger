@@ -233,7 +233,7 @@
                                                     <span class="sm:hidden">Konfirmasi</span>
                                                 </span>
                                             @elseif($visit->status === 'confirmed_by_admin')
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -241,7 +241,7 @@
                                                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                                         </path>
                                                     </svg>
-                                                    <span class="hidden sm:inline">Menunggu Admin</span>
+                                                    <span class="hidden sm:inline">Siap dikunjungi</span>
                                                     <span class="sm:hidden">Admin</span>
                                                 </span>
                                             @elseif($visit->status === 'confirmed_by_author')
