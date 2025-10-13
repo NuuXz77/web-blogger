@@ -311,7 +311,7 @@
                                         <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex items-center space-x-2">
                                                 <!-- Detail Button -->
-                                                <a href="{{ route('user.audit.show', $visit) }}"
+                                                <a href="{{ route('auditor.audit.show', $visit) }}"
                                                     class="text-blue-600 hover:text-blue-900 flex items-center gap-1 px-2 md:px-3 py-1 rounded-md hover:bg-blue-50 transition-colors text-xs md:text-sm">
                                                     <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -327,7 +327,7 @@
                                                 </a>
 
                                                 @if ($visit->status === 'confirmed_by_admin')
-                                                    <a href="{{ route('user.audit.report', $visit) }}"
+                                                    <a href="{{ route('auditor.audit.report', $visit) }}"
                                                         class="bg-green-600 text-white px-3 md:px-4 py-1 md:py-2 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2 text-xs md:text-sm">
                                                         <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
